@@ -1,0 +1,1 @@
+.nowrap{white-space:nowrap !important}@media (max-width: 599px){.nowrap [class*="columns-"]{display:grid;grid-template-columns:repeat(var(--columns), 1fr)}}.wrap{white-space:normal;flex-wrap:wrap}
