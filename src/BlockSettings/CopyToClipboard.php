@@ -2,16 +2,14 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Interfaces\Scriptable;
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Scripts;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Framework\InlineAssets\Scriptable;
+use Blockify\Framework\InlineAssets\Scripts;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function esc_html__;
 use function explode;
@@ -26,9 +24,7 @@ use function wp_strip_all_tags;
  *
  * @since 1.0.0
  */
-class CopyToClipboard implements Hookable, Renderable, Scriptable, Styleable {
-
-	use HookAnnotations;
+class CopyToClipboard implements Renderable, Scriptable, Styleable {
 
 	/**
 	 * Renders the code block.
@@ -104,10 +100,7 @@ SVG;
 	 * @return void
 	 */
 	public function scripts( Scripts $scripts ): void {
-		$scripts->add()
-			->handle( 'copy-to-clipboard' )
-			->src( 'public/copy-to-clipboard.js' )
-			->condition( static fn( string $template_html ): bool => str_contains( $template_html, 'copy-to-clipboard' ) );
+		$scripts->add_file( 'copy-to-clipboard.js', [ 'copy-to-clipboard' ] );
 	}
 
 	/**
@@ -120,10 +113,7 @@ SVG;
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
-		$styles->add()
-			->handle( 'copy-to-clipboard' )
-			->src( 'public/copy-to-clipboard.css' )
-			->condition( static fn( string $template_html ): bool => str_contains( $template_html, 'copy-to-clipboard' ) );
+		$styles->add_file( 'extensions/copy-to-clipboard.css', [ 'copy-to-clipboard' ] );
 	}
 
 }

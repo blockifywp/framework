@@ -2,12 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockVariations;
+namespace Blockify\Framework\BlockVariations;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 
 /**
@@ -15,9 +13,7 @@ use WP_Block;
  *
  * @since 1.3.2
  */
-class CurvedText implements Hookable, Renderable {
-
-	use HookAnnotations;
+class CurvedText implements Renderable {
 
 	/**
 	 * Renders curved text.

@@ -2,19 +2,14 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
-
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
+namespace Blockify\Framework\DesignSystem;
 
 /**
  * Emojis extension.
  *
  * @since 0.9.10
  */
-class Emojis implements Hookable {
-
-	use HookAnnotations;
+class Emojis {
 
 	/**
 	 * Adds editor only styles.

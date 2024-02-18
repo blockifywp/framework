@@ -2,11 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Data\Data;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
+use Blockify\Framework\InlineAssets\Styles;
 use function array_flip;
 use function file_get_contents;
 use function is_a;
@@ -20,28 +18,26 @@ use function wp_add_inline_style;
  *
  * @since 0.9.19
  */
-class BlockCss implements Hookable {
-
-	use HookAnnotations;
+class BlockCss {
 
 	/**
-	 * Theme or plugin data.
+	 * CSS dir.
 	 *
-	 * @var Data
+	 * @var string
 	 */
-	private Data $data;
+	private string $css_dir;
 
 	/**
 	 * BlockCss constructor.
 	 *
 	 * @since 0.9.19
 	 *
-	 * @param Data $data Theme or plugin data.
+	 * @param Styles $styles Package config.
 	 *
 	 * @return void
 	 */
-	public function __construct( Data $data ) {
-		$this->data = $data;
+	public function __construct( Styles $styles ) {
+		$this->css_dir = $styles->dir;
 	}
 
 	/**
@@ -51,7 +47,7 @@ class BlockCss implements Hookable {
 	 *
 	 * @since 0.9.19
 	 *
-	 * @hook  enqueue_block_assets
+	 * @hook  enqueue_block_assets 11
 	 *
 	 * @return void
 	 */
@@ -62,8 +58,7 @@ class BlockCss implements Hookable {
 			return;
 		}
 
-		$dir = $this->data->dir . 'vendor/blockify/extensions/public/css/core-blocks/';
-
+		$dir     = $this->css_dir . 'core-blocks/';
 		$handles = array_flip( $wp_styles->queue );
 
 		foreach ( $wp_styles->registered as $handle => $style ) {

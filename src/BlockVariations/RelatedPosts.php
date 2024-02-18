@@ -2,10 +2,8 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockVariations;
+namespace Blockify\Framework\BlockVariations;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
 use WP_Block;
 use function array_replace_recursive;
 use function get_object_taxonomies;
@@ -21,9 +19,7 @@ use function str_contains;
  *
  * @since 1.0.0
  */
-class RelatedPosts implements Hookable {
-
-	use HookAnnotations;
+class RelatedPosts {
 
 	/**
 	 * Query block tax relation.
@@ -85,5 +81,4 @@ class RelatedPosts implements Hookable {
 			]
 		);
 	}
-
 }

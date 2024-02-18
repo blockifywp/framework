@@ -2,12 +2,12 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Utilities\Color;
-use Blockify\Core\Utilities\CSS;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\Color;
+use Blockify\Utilities\CSS;
 use function file_exists;
 use function get_template_directory;
 use function wp_get_global_settings;
@@ -33,10 +33,7 @@ class DeprecatedStyles implements Styleable {
 		$css = CSS::array_to_string( $this->get_deprecated_color_palette() );
 		$css .= CSS::array_to_string( $this->get_deprecated_typography() );
 
-		$styles->add()
-			->handle( 'deprecated' )
-			->inline_css( static fn(): string => "body{{$css}}" )
-			->condition( static fn() => ! empty( $css ) );
+		$styles->add_string( "body{{$css}}", [], ! empty( $css ) );
 	}
 
 	/**

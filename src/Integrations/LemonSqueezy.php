@@ -2,12 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\Integrations;
+namespace Blockify\Framework\Integrations;
 
-use Blockify\Core\Interfaces\Conditional;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Conditional;
 use function array_filter;
 use function defined;
 use function explode;
@@ -18,9 +16,7 @@ use function implode;
  *
  * @since 1.0.0
  */
-class LemonSqueezy implements Hookable, Conditional {
-
-	use HookAnnotations;
+class LemonSqueezy implements Conditional {
 
 	/**
 	 * Condition.
@@ -44,9 +40,9 @@ class LemonSqueezy implements Hookable, Conditional {
 	 */
 	public function render_lemonsqueezy_button( string $html ): string {
 		$dom    = DOM::create( $html );
-		$div    = DOM::get_dom_element( 'div', $dom );
-		$button = DOM::get_dom_element( 'div', $div );
-		$link   = DOM::get_dom_element( 'a', $button );
+		$div    = DOM::get_element( 'div', $dom );
+		$button = DOM::get_element( 'div', $div );
+		$link   = DOM::get_element( 'a', $button );
 
 		if ( ! $link ) {
 			return $html;

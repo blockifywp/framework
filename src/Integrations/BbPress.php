@@ -2,9 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\Integrations;
+namespace Blockify\Framework\Integrations;
 
-use Blockify\Core\Interfaces\Conditional;
+use Blockify\Utilities\Interfaces\Conditional;
 use function class_exists;
 use function file_exists;
 use function get_stylesheet_directory;

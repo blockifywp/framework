@@ -2,11 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\Integrations;
+namespace Blockify\Framework\Integrations;
 
-use Blockify\Core\Interfaces\Conditional;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
+use Blockify\Utilities\Interfaces\Conditional;
 use function add_filter;
 use function add_theme_support;
 use function class_exists;
@@ -16,9 +14,7 @@ use function class_exists;
  *
  * @since 1.0.0
  */
-class LifterLMS implements Hookable, Conditional {
-
-	use HookAnnotations;
+class LifterLMS implements Conditional {
 
 	/**
 	 * Condition.

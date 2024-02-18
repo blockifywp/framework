@@ -2,11 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\Pattern;
+use Blockify\Utilities\Pattern;
 use WP_Block_Patterns_Registry;
 use function apply_filters;
 use function array_unique;
@@ -27,9 +25,7 @@ use function ucwords;
  *
  * @since 0.0.2
  */
-class Patterns implements Hookable {
-
-	use HookAnnotations;
+class Patterns {
 
 	/**
 	 * Removes core block patterns.
@@ -119,7 +115,7 @@ class Patterns implements Hookable {
 					continue;
 				}
 
-				Pattern::register_block_pattern_from_file( $file );
+				Pattern::register_from_file( $file );
 			}
 		}
 	}

@@ -2,13 +2,12 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Framework\BlockSettings\CssFilter;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function esc_attr;
 use function explode;
@@ -19,9 +18,27 @@ use function implode;
  *
  * @since 1.0.0
  */
-class PostFeaturedImage implements Hookable, Renderable {
+class PostFeaturedImage implements Renderable {
 
-	use HookAnnotations;
+	/**
+	 * Filter settings.
+	 *
+	 * @var array
+	 */
+	private array $filter_options;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param CssFilter $css_filter CssFilter service.
+	 *
+	 * @return void
+	 */
+	public function __construct( CssFilter $css_filter ) {
+		$this->filter_options = $css_filter->settings;
+	}
 
 	/**
 	 * Modifies front end HTML output of block.
@@ -113,7 +130,7 @@ class PostFeaturedImage implements Hookable, Renderable {
 		$filter = $attrs['style']['filter'] ?? [];
 
 		if ( ! empty( $filter ) && is_array( $filter ) ) {
-			$filter_options = get_filter_options();
+			$filter_options = $this->filter_options;
 			$filter_value   = '';
 
 			foreach ( $filter as $key => $value ) {

@@ -2,11 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Utilities\CSS;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\CSS;
 use function apply_filters;
 use function array_merge;
 use function wp_get_global_settings;
@@ -31,9 +31,7 @@ class CustomProperties implements Styleable {
 	public function styles( Styles $styles ): void {
 		$inline = 'body{' . CSS::array_to_string( $this->get_custom_properties() ) . '}';
 
-		$styles->add()
-			->handle( $styles->prefix )
-			->inline_css( static fn(): string => $inline );
+		$styles->add_string( $inline );
 	}
 
 	/**

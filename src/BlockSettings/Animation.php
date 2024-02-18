@@ -2,16 +2,15 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Interfaces\Scriptable;
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Styles;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
-use Blockify\Core\Utilities\Str;
-use Blockify\Extensions\ExtensionConfig;
+use Blockify\Framework\InlineAssets\Scriptable;
+use Blockify\Framework\InlineAssets\Scripts;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_diff;
 use function array_keys;
@@ -20,6 +19,7 @@ use function esc_attr;
 use function explode;
 use function file_exists;
 use function file_get_contents;
+use function is_admin;
 use function str_contains;
 
 /**
@@ -30,77 +30,19 @@ use function str_contains;
 class Animation implements Renderable, Styleable, Scriptable {
 
 	/**
-	 * Provider.
+	 * CSS dir.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @var ExtensionConfig
 	 */
-	private ExtensionConfig $config;
+	private string $css_dir;
 
 	/**
-	 * Animation constructor.
+	 * Constructor.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param ExtensionConfig $config Data service.
-	 *
-	 * @return void
 	 */
-	public function __construct( ExtensionConfig $config ) {
-		$this->config = $config;
-	}
-
-	public function styles( Styles $styles ): void {
-		$styles->add( 'animation' )
-			->src( $this->config->url . 'public/animation.css' )
-			->template_contains( 'has-animation', 'has-scroll-animation' );
-
-		$styles->add( 'animations' )
-			->inline( [ $this, 'get_animation_styles' ] );
-	}
-
-	/**
-	 * Adds animation scripts.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $template_html The template HTML.
-	 *
-	 * @return string
-	 */
-	public function scripts( string $template_html ): string {
-		$scripts->add()
-			->handle( 'editor' )
-			->localize(
-				[
-					$scripts->prefix,
-					[
-						'animations' => array_keys( $this->get_animations() ),
-					],
-				]
-			)
-			->context( [ AbstractAssets::EDITOR ] );
-
-		$scripts->add()
-			->handle( 'animation' )
-			->contains( 'has-animation' );
-
-		$js = '';
-
-		if ( ! $template_html || Str::contains_any( $template_html, 'has-animation', 'has-scroll-animation' ) ) {
-			$js .= file_get_contents( $this->config->dir . 'public/animation.js' );
-		}
-
-		if ( ! $template_html || Str::contains_any( $template_html, 'animation-event:scroll', 'has-scroll-animation' ) ) {
-			$js .= file_get_contents( $this->config->dir . 'public/scroll.js' );
-		}
-
-		if ( ! $template_html || Str::contains_any( $template_html, 'packery' ) ) {
-			$js .= file_get_contents( $this->config->dir . 'public/packery.js' );
-		}
-
-		return $js;
+	public function __construct( Styles $styles ) {
+		$this->css_dir = $styles->dir;
 	}
 
 	/**
@@ -185,20 +127,68 @@ class Animation implements Renderable, Styleable, Scriptable {
 	}
 
 	/**
+	 * Adds animation styles.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param Styles $styles Inlinable service.
+	 *
+	 * @return void
+	 */
+	public function styles( Styles $styles ): void {
+		$styles->add_callback( [ $this, 'get_animation_styles' ] );
+		$styles->add_file( 'block-extensions/animation.css', [ 'has-animation', 'has-scroll-animation' ] );
+	}
+
+	/**
+	 * Adds animation scripts.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param Scripts $scripts Inlinable service.
+	 *
+	 * @return void
+	 */
+	public function scripts( Scripts $scripts ): void {
+		$scripts->add_data(
+			'animations',
+			array_keys( $this->get_animations() ),
+			[],
+			is_admin()
+		);
+
+		$scripts->add_file(
+			'animation.js',
+			[ 'has-animation', 'has-scroll-animation' ]
+		);
+
+		$scripts->add_file(
+			'scroll.js',
+			[ 'animation-event:scroll', 'has-scroll-animation' ]
+		);
+
+		$scripts->add_file(
+			'packery.js',
+			[ 'packery' ]
+		);
+	}
+
+	/**
 	 * Returns inline styles for animations.
 	 *
 	 * @since 0.9.19
 	 *
 	 * @param string $template_html The template HTML.
+	 * @param bool   $load_all      Whether to load all styles.
 	 *
 	 * @return string
 	 */
-	private function get_animation_styles( string $template_html ): string {
+	public function get_animation_styles( string $template_html, bool $load_all ): string {
 		$animations = $this->get_animations();
 		$css        = '';
 
 		foreach ( $animations as $name => $animation ) {
-			if ( ! $template_html || str_contains( $template_html, "animation-name:{$name}" ) ) {
+			if ( $load_all || str_contains( $template_html, "animation-name:{$name}" ) ) {
 				$css .= "@keyframes $name" . trim( $animation );
 			}
 		}
@@ -211,12 +201,10 @@ class Animation implements Renderable, Styleable, Scriptable {
 	 *
 	 * @since 0.9.18
 	 *
-	 * @hook  blockify_styles
-	 *
 	 * @return array
 	 */
 	private function get_animations(): array {
-		$file = $this->config->css_dir . 'block-extensions/animations.css';
+		$file = $this->css_dir . 'block-extensions/animations.css';
 
 		if ( ! file_exists( $file ) ) {
 			return [];

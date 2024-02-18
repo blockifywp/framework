@@ -2,11 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function str_contains;
 use function str_replace;
@@ -17,17 +15,15 @@ use function wp_get_global_settings;
  *
  * @since 1.0.0
  */
-class SubHeading implements Hookable, Renderable {
-
-	use HookAnnotations;
+class SubHeading implements Renderable {
 
 	/**
 	 * Add sub heading clip text.
 	 *
 	 * @since 1.3.2
 	 *
-	 * @param string    $block_content Block HTML.
-	 * @param array     $block         Block data.
+	 * @param string   $block_content Block HTML.
+	 * @param array    $block         Block data.
 	 * @param WP_Block $instance      Block instance.
 	 *
 	 * @hook  render_block

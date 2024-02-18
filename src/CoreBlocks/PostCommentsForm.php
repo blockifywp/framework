@@ -2,12 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function apply_filters;
 use function esc_attr;
@@ -17,9 +15,7 @@ use function esc_attr;
  *
  * @since 1.0.0
  */
-class PostCommentsForm implements Hookable, Renderable {
-
-	use HookAnnotations;
+class PostCommentsForm implements Renderable {
 
 	/**
 	 * Renders the Post Comments Form block.

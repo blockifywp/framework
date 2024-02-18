@@ -2,30 +2,24 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
-use Blockify\Core\Utilities\Str;
-use DOMDocument;
-use DOMElement;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Icon;
+use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Utilities\Str;
 use WP_Block;
-use function apply_filters;
 use function array_merge;
 use function esc_attr;
-use function esc_html__;
 use function esc_url;
 use function explode;
 use function implode;
 use function in_array;
 use function is_archive;
 use function property_exists;
-use function str_contains;
 use function str_replace;
 
 /**
@@ -33,9 +27,7 @@ use function str_replace;
  *
  * @since 1.0.0
  */
-class Placeholder implements Hookable, Renderable, Styleable {
-
-	use HookAnnotations;
+class Placeholder implements Renderable, Styleable {
 
 	/**
 	 * Conditionally adds placeholder styles.
@@ -47,10 +39,11 @@ class Placeholder implements Hookable, Renderable, Styleable {
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
-		$styles->add()
-			->handle( 'placeholder' )
-			->src( 'block-extensions/placeholder-image.css' )
-			->condition( static fn( string $template_html ): bool => str_contains( $template_html, 'is-placeholder' ) || is_archive() );
+		$styles->add_file(
+			'block-extensions/placeholder-image.css',
+			[ 'is-placeholder' ],
+			is_archive()
+		);
 	}
 
 	/**
@@ -67,6 +60,12 @@ class Placeholder implements Hookable, Renderable, Styleable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
+		$name = $block['blockName'] ?? '';
+
+		if ( ! Str::contains_any( $name, 'image' ) ) {
+			return $block_content;
+		}
+
 		$attrs           = $block['attrs'] ?? [];
 		$id              = $attrs['id'] ?? '';
 		$has_icon        = ( $attrs['iconSet'] ?? '' ) && ( $attrs['iconName'] ?? '' ) || ( $attrs['iconSvgString'] ?? '' );
@@ -131,7 +130,7 @@ class Placeholder implements Hookable, Renderable, Styleable {
 		}
 
 		$is_link     = $block['attrs']['isLink'] ?? false;
-		$placeholder = $this->get_placeholder_icon( $dom );
+		$placeholder = Icon::get_placeholder( $dom );
 
 		if ( $placeholder->tagName === 'svg' ) {
 			$classes[] = 'has-placeholder-icon';
@@ -239,51 +238,6 @@ class Placeholder implements Hookable, Renderable, Styleable {
 		$figure->setAttribute( 'class', implode( ' ', $classes ) );
 
 		return $dom->saveHTML();
-	}
-
-	/**
-	 * Returns placeholder icon element.
-	 *
-	 * @param DOMDocument $dom DOM document.
-	 *
-	 * @return DOMElement
-	 */
-	public function get_placeholder_icon( DOMDocument $dom ): DOMElement {
-
-		$svg_title = esc_html__( 'Image placeholder', 'blockify' );
-		$svg_icon  = <<<HTML
-<svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 64 64" width="32" height="32">
-	<title>$svg_title</title>
-	<circle cx="52" cy="18" r="7"/>
-	<path d="M47 32.1 39 41 23 20.9 0 55.1h64z"/>
-</svg>
-HTML;
-
-		/**
-		 * Filters the SVG icon for the placeholder image.
-		 *
-		 * @since 1.3.0
-		 *
-		 * @param string $svg_icon  SVG icon.
-		 * @param string $svg_title SVG title.
-		 */
-		$svg_icon    = apply_filters( 'blockify_placeholder_svg', $svg_icon, $svg_title );
-		$svg_dom     = DOM::create( $svg_icon );
-		$svg_element = DOM::get_element( 'svg', $svg_dom );
-
-		if ( ! $svg_element ) {
-			return DOM::create_element( 'span', $dom );
-		}
-
-		$svg_classes   = explode( ' ', $svg_element->getAttribute( 'class' ) );
-		$svg_classes[] = 'wp-block-image__placeholder-icon';
-
-		$svg_element->setAttribute( 'class', implode( ' ', $svg_classes ) );
-		$svg_element->setAttribute( 'fill', 'currentColor' );
-
-		$imported = $dom->importNode( $svg_element, true );
-
-		return DOM::node_to_element( $imported );
 	}
 
 }

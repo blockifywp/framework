@@ -2,15 +2,13 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Icon;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
-use function Blockify\Extensions\BlockSettings\get_placeholder_icon;
 use function is_null;
 
 /**
@@ -18,9 +16,7 @@ use function is_null;
  *
  * @since 1.0.0
  */
-class Cover implements Hookable, Renderable {
-
-	use HookAnnotations;
+class Cover implements Renderable {
 
 	/**
 	 * Renders the cover block.
@@ -46,7 +42,7 @@ class Cover implements Hookable, Renderable {
 		$url = $block['attrs']['url'] ?? null;
 
 		if ( ! $url ) {
-			$imported = $dom->importNode( get_placeholder_icon( $dom ), true );
+			$imported = $dom->importNode( Icon::get_placeholder( $dom ), true );
 			$svg      = DOM::node_to_element( $imported );
 
 			$classes   = [];

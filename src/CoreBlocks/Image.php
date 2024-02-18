@@ -2,15 +2,12 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Configurable;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
-use Blockify\Extensions\ExtensionsConfig;
+use Blockify\Framework\BlockSettings\Image as ImageSettings;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function in_array;
 
@@ -19,10 +16,25 @@ use function in_array;
  *
  * @since 1.0.0
  */
-class Image implements Hookable, Renderable, Configurable {
+class Image implements Renderable {
 
-	use HookAnnotations;
-	use ExtensionsConfig;
+	/**
+	 * Image settings.
+	 *
+	 * @var array
+	 */
+	private array $image_settings;
+
+	/**
+	 * Image constructor.
+	 *
+	 * @param ImageSettings $image Image settings.
+	 *
+	 * @return void
+	 */
+	public function __construct( ImageSettings $image ) {
+		$this->image_settings = $image->settings;
+	}
 
 	/**
 	 * Modifies front end HTML output of block.
@@ -57,7 +69,7 @@ class Image implements Hookable, Renderable, Configurable {
 				$block_content = CSS::add_responsive_classes(
 					$block_content,
 					$block,
-					$this->config['block_settings']['image'],
+					$this->image_settings,
 					(bool) $id
 				);
 			}

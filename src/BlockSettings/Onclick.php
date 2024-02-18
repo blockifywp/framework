@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\DOM;
-use Blockify\Core\Utilities\JS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Utilities\JS;
 use WP_Block;
 use function str_contains;
 use function strval;
@@ -18,10 +16,13 @@ use function strval;
  *
  * @since 1.0.0
  */
-class Onclick implements Hookable, Renderable {
+class Onclick implements Renderable {
 
-	use HookAnnotations;
-
+	/**
+	 * TemplateTags instance.
+	 *
+	 * @var TemplateTags
+	 */
 	private TemplateTags $template_tags;
 
 	/**

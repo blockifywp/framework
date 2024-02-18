@@ -2,24 +2,37 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions;
+namespace Blockify\Framework;
 
-use Blockify\Core\Container;
-use Blockify\Core\Interfaces\Registerable;
-use Blockify\Core\Interfaces\Scriptable;
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Hooks;
-use Blockify\Core\Services\Scripts;
-use Blockify\Core\Services\Styles;
+use Blockify\Framework\InlineAssets\Scriptable;
+use Blockify\Framework\InlineAssets\Scripts;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\Container;
+use Blockify\Utilities\Hook;
+use Blockify\Utilities\Interfaces\Registerable;
 use function is_object;
 
-class ExtensionServiceProvider implements Registerable {
+/**
+ * Service provider.
+ *
+ * @since 1.0.0
+ */
+class ServiceProvider implements Registerable {
 
+	/**
+	 * Services.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var array
+	 */
 	private array $services = [
 		BlockSettings\Animation::class,
 		BlockSettings\BackdropBlur::class,
 		BlockSettings\BoxShadow::class,
 		BlockSettings\CopyToClipboard::class,
+		BlockSettings\CssFilter::class,
 		BlockSettings\InlineColor::class,
 		BlockSettings\InlineSvg::class,
 		BlockSettings\Onclick::class,
@@ -77,12 +90,16 @@ class ExtensionServiceProvider implements Registerable {
 		DesignSystem\AdminBar::class,
 		DesignSystem\BaseCss::class,
 		DesignSystem\BlockCss::class,
+		DesignSystem\BlockStyles::class,
+		DesignSystem\BlockScripts::class,
+		DesignSystem\BlockSupports::class,
 		DesignSystem\ChildTheme::class,
 		DesignSystem\ConicGradient::class,
 		DesignSystem\CustomProperties::class,
 		DesignSystem\DarkMode::class,
 		DesignSystem\DeprecatedStyles::class,
 		DesignSystem\Emojis::class,
+		DesignSystem\EditorAssets::class,
 		DesignSystem\Layout::class,
 		DesignSystem\Patterns::class,
 		DesignSystem\SystemFonts::class,
@@ -97,62 +114,50 @@ class ExtensionServiceProvider implements Registerable {
 	];
 
 	/**
-	 * Hooks service.
+	 * Main plugin or theme file.
 	 *
-	 * @var Hooks
+	 * @var string
 	 */
-	private Hooks $hooks;
+	private string $file;
 
 	/**
-	 * Scripts service.
+	 * Constructor.
 	 *
-	 * @var Scripts
-	 */
-	private Scripts $scripts;
-
-	/**
-	 * Styles service.
+	 * @param string $file Main plugin or theme file.
 	 *
-	 * @var Styles
+	 * @return void
 	 */
-	private Styles $styles;
-
-	/**
-	 * ExtensionServiceProvider constructor.
-	 *
-	 * @param Hooks   $hooks   Hooks service.
-	 * @param Scripts $scripts Scripts service.
-	 * @param Styles  $styles  Styles service.
-	 */
-	public function __construct( Hooks $hooks, Scripts $scripts, Styles $styles ) {
-		$this->hooks   = $hooks;
-		$this->scripts = $scripts;
-		$this->styles  = $styles;
+	public function __construct( string $file ) {
+		$this->file = $file;
 	}
 
 	/**
-	 * Register services.
+	 * Registers the package configuration and returns instance.
 	 *
-	 * @param Container $container Container instance.
+	 * @param Container $container Dependency injection container.
 	 *
 	 * @return void
 	 */
 	public function register( Container $container ): void {
+		$scripts = $container->make( Scripts::class, $this->file );
+		$styles  = $container->make( Styles::class, $this->file );
+
+		Hook::annotations( $scripts );
+		Hook::annotations( $styles );
+
 		foreach ( $this->services as $id ) {
-			$service = $container->create( $id );
+			$service = $container->make( $id );
 
 			if ( is_object( $service ) ) {
-				$this->hooks->add_annotations( $service );
+				Hook::annotations( $service );
 			}
 
 			if ( $service instanceof Scriptable ) {
-				$this->scripts->add_callback( [ $service, 'scripts' ] );
+				$service->scripts( $scripts );
 			}
 
 			if ( $service instanceof Styleable ) {
-				$this->styles->add_callback( [ $service, 'styles' ] );
-
-				$service->styles( $this->styles );
+				$service->styles( $styles );
 			}
 		}
 	}

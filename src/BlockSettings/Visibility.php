@@ -2,14 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Interfaces\Scriptable;
-use Blockify\Core\Services\Assets\AbstractAssets;
-use Blockify\Core\Services\Assets\Scripts;
-use Blockify\Core\Traits\HookAnnotations;
+use Blockify\Framework\InlineAssets\Scriptable;
+use Blockify\Framework\InlineAssets\Scripts;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_intersect;
 use function array_keys;
@@ -19,6 +16,7 @@ use function function_exists;
 use function get_option;
 use function get_plugins;
 use function in_array;
+use function is_admin;
 use function is_array;
 use function is_user_logged_in;
 use function trim;
@@ -31,9 +29,7 @@ use const DIRECTORY_SEPARATOR;
  *
  * @since 1.0.0
  */
-class Visibility implements Hookable, Renderable, Scriptable {
-
-	use HookAnnotations;
+class Visibility implements Renderable, Scriptable {
 
 	/**
 	 * Render block visibility.
@@ -43,6 +39,7 @@ class Visibility implements Hookable, Renderable, Scriptable {
 	 * @param WP_Block $instance      Block instance.
 	 *
 	 * @hook render_block 11
+	 * @hook blockify_tabs_tab_visibility
 	 *
 	 * @return string
 	 */
@@ -129,20 +126,31 @@ class Visibility implements Hookable, Renderable, Scriptable {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$data['userRoles'] = $wp_roles->role_names;
-		$data['plugins']   = array_map(
+		$plugins = array_map(
 			static fn( $plugin_path ): string => explode( DIRECTORY_SEPARATOR, $plugin_path )[0] ?? '',
 			array_keys( get_plugins() )
 		);
-		$data['postMeta']  = get_option( 'blockify' )['postMetaKeys'] ?? [];
 
-		$scripts->add()
-			->handle( 'editor' )
-			->localize( [
-				$scripts->prefix,
-				$data,
-			] )
-			->context( [ AbstractAssets::EDITOR ] );
+		$scripts->add_data(
+			'userRoles',
+			$wp_roles->role_names,
+			[],
+			is_admin()
+		);
+
+		$scripts->add_data(
+			'plugins',
+			$plugins,
+			[],
+			is_admin()
+		);
+
+		$scripts->add_data(
+			'postMeta',
+			get_option( $scripts->handle )['postMetaKeys'] ?? [],
+			[],
+			is_admin()
+		);
 	}
 
 }

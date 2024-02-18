@@ -2,26 +2,21 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Interfaces\Scriptable;
-use Blockify\Core\Services\Assets\Scripts;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Framework\InlineAssets\Scriptable;
+use Blockify\Framework\InlineAssets\Scripts;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
-use function str_contains;
 
 /**
  * Details class.
  *
  * @since 1.0.0
  */
-class Details implements Hookable, Renderable, Scriptable {
-
-	use HookAnnotations;
+class Details implements Renderable, Scriptable {
 
 	/**
 	 * Renders the details block.
@@ -73,10 +68,7 @@ class Details implements Hookable, Renderable, Scriptable {
 	 * @return void
 	 */
 	public function scripts( Scripts $scripts ): void {
-		$scripts->add()
-			->handle( 'details-block' )
-			->src( 'public/details.js' )
-			->condition( static fn( string $template_html ): bool => str_contains( $template_html, 'wp-block-details' ) );
+		$scripts->add_file( 'details.js', [ 'wp-block-details' ] );
 	}
 
 }

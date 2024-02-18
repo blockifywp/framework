@@ -2,10 +2,8 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
 use function array_merge;
 use function is_admin;
 use function str_replace;
@@ -15,9 +13,7 @@ use function str_replace;
  *
  * @since 0.4.2
  */
-class Layout implements Hookable {
-
-	use HookAnnotations;
+class Layout {
 
 	/**
 	 * Changes layout size unit from vw to % in editor.

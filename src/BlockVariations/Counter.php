@@ -2,18 +2,15 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockVariations;
+namespace Blockify\Framework\BlockVariations;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Interfaces\Scriptable;
-use Blockify\Core\Services\Assets\Scripts;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Framework\InlineAssets\Scriptable;
+use Blockify\Framework\InlineAssets\Scripts;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function esc_attr;
 use function esc_html;
-use function str_contains;
 use function trim;
 
 /**
@@ -21,9 +18,7 @@ use function trim;
  *
  * @since 0.9.10
  */
-class Counter implements Hookable, Renderable, Scriptable {
-
-	use HookAnnotations;
+class Counter implements Renderable, Scriptable {
 
 	/**
 	 * Render counter block markup.
@@ -71,10 +66,7 @@ class Counter implements Hookable, Renderable, Scriptable {
 	 * @return void
 	 */
 	public function scripts( Scripts $scripts ): void {
-		$scripts->add()
-			->handle( 'counter' )
-			->src( 'public/counter.js' )
-			->condition( static fn( string $template_html ): bool => str_contains( $template_html, 'is-style-counter' ) );
+		$scripts->add_file( 'counter.js', [ 'is-style-counter' ] );
 	}
 }
 

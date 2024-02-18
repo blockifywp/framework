@@ -2,11 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function str_replace;
 
@@ -15,9 +13,7 @@ use function str_replace;
  *
  * @since 1.0.0
  */
-class Shortcode implements Hookable, Renderable {
-
-	use HookAnnotations;
+class Shortcode implements Renderable {
 
 	/**
 	 * Fix shortcode block empty paragraph tags.

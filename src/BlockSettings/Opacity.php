@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 
 /**
@@ -16,9 +14,7 @@ use WP_Block;
  *
  * @since 1.0.0
  */
-class Opacity implements Hookable, Renderable {
-
-	use HookAnnotations;
+class Opacity implements Renderable {
 
 	/**
 	 * Renders block opacity style.

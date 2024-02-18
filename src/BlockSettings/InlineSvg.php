@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_diff;
 use function content_url;
@@ -30,9 +28,7 @@ use function urldecode;
  *
  * @since 1.5.0
  */
-class InlineSvg implements Hookable, Renderable {
-
-	use HookAnnotations;
+class InlineSvg implements Renderable {
 
 	/**
 	 * Renders inline SVGs in rich text content.

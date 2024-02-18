@@ -2,11 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\Integrations;
+namespace Blockify\Framework\Integrations;
 
-use Blockify\Core\Interfaces\Conditional;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
+use Blockify\Utilities\Interfaces\Conditional;
 use function function_exists;
 use function wp_get_global_settings;
 
@@ -15,9 +13,7 @@ use function wp_get_global_settings;
  *
  * @since 1.0.0
  */
-class SyntaxHighlightingCodeBlock implements Hookable, Conditional {
-
-	use HookAnnotations;
+class SyntaxHighlightingCodeBlock implements Conditional {
 
 	/**
 	 * Condition.

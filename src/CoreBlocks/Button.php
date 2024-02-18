@@ -2,18 +2,15 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Configurable;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
-use Blockify\Core\Utilities\Icon;
-use Blockify\Core\Utilities\JS;
-use Blockify\Core\Utilities\Str;
-use Blockify\Extensions\ExtensionsConfig;
+use Blockify\Framework\BlockSettings\Responsive;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Icon;
+use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Utilities\JS;
+use Blockify\Utilities\Str;
 use WP_Block;
 use function array_unique;
 use function esc_attr;
@@ -25,10 +22,30 @@ use function str_contains;
 use function str_replace;
 use function wp_get_global_settings;
 
-class Button implements Hookable, Renderable, Configurable {
+/**
+ * Button block.
+ *
+ * @since 0.0.2
+ */
+class Button implements Renderable {
 
-	use HookAnnotations;
-	use ExtensionsConfig;
+	/**
+	 * Responsive settings.
+	 *
+	 * @var array
+	 */
+	private array $responsive_settings;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param Responsive $responsive Block settings.
+	 *
+	 * @return void
+	 */
+	public function __construct( Responsive $responsive ) {
+		$this->responsive_settings = $responsive->settings;
+	}
 
 	/**
 	 * Modifies front end HTML output of block.
@@ -128,7 +145,7 @@ class Button implements Hookable, Renderable, Configurable {
 
 		$icon_set  = $block['attrs']['iconSet'] ?? '';
 		$icon_name = $block['attrs']['iconName'] ?? '';
-		$icon      = $icon_set && $icon_name ? Icon::get_icon( $icon_set, $icon_name ) : '';
+		$icon      = $icon_set && $icon_name ? Icon::get_svg( $icon_set, $icon_name ) : '';
 
 		if ( $icon ) {
 			$dom = DOM::create( $block_content );
@@ -263,14 +280,14 @@ class Button implements Hookable, Renderable, Configurable {
 				$svg->firstChild
 			);
 
-			$text = $dom->createTextNode( Str::to_title_case( $block['attrs']['iconName'] ?? '' ) );
+			$text = $dom->createTextNode( Str::title_case( $block['attrs']['iconName'] ?? '' ) );
 
 			$title->appendChild( $text );
 
 			$block_content = CSS::add_responsive_classes(
 				$dom->saveHTML(),
 				$block,
-				$this->config['block_settings']['responsive']
+				$this->responsive_settings
 			);
 		}
 

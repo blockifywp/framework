@@ -2,16 +2,13 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockVariations;
+namespace Blockify\Framework\BlockVariations;
 
-use Blockify\Core\Interfaces\Configurable;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
-use Blockify\Core\Utilities\Icon as IconUtility;
-use Blockify\Extensions\ExtensionsConfig;
+use Blockify\Framework\BlockSettings\Responsive;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Icon as IconUtility;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function in_array;
 use function is_array;
@@ -23,10 +20,27 @@ use function str_replace;
  *
  * @since 1.0.0
  */
-class Icon implements Hookable, Renderable, Configurable {
+class Icon implements Renderable {
 
-	use HookAnnotations;
-	use ExtensionsConfig;
+	/**
+	 * Responsive settings.
+	 *
+	 * @var array
+	 */
+	private array $responsive_settings;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param Responsive $responsive Responsive settings.
+	 *
+	 * @return void
+	 */
+	public function __construct( Responsive $responsive ) {
+		$this->responsive_settings = $responsive->settings;
+	}
 
 	/**
 	 * Modifies front end HTML output of block.
@@ -71,7 +85,7 @@ class Icon implements Hookable, Renderable, Configurable {
 		}
 
 		$figure_classes      = explode( ' ', $figure->getAttribute( 'class' ) );
-		$block_extras        = $this->config['block_settings']['responsive'];
+		$block_extras        = $this->responsive_settings;
 		$block_extra_classes = [];
 
 		foreach ( $block_extras as $name => $args ) {
@@ -151,7 +165,7 @@ class Icon implements Hookable, Renderable, Configurable {
 			unset( $figure_styles[ $key ] );
 		}
 
-		$svg_string = $attrs['iconSvgString'] ?? IconUtility::get_icon( $icon_set, $icon_name );
+		$svg_string = $attrs['iconSvgString'] ?? IconUtility::get_svg( $icon_set, $icon_name );
 
 		if ( $gradient && $svg_string ) {
 			$span_styles['--wp--custom--icon--url'] = 'url(\'data:image/svg+xml;utf8,' . $svg_string . '\')';
@@ -248,7 +262,7 @@ class Icon implements Hookable, Renderable, Configurable {
 		}
 
 		if ( ! $gradient ) {
-			$icon = IconUtility::get_icon( $icon_set, $icon_name, $size );
+			$icon = IconUtility::get_svg( $icon_set, $icon_name, $size );
 
 			if ( $icon ) {
 				$icon_dom      = DOM::create( $icon );
@@ -262,12 +276,12 @@ class Icon implements Hookable, Renderable, Configurable {
 		$block_content = CSS::add_responsive_classes(
 			$block_content,
 			$block,
-			$this->config['block_settings']['responsive']
+			$this->responsive_settings
 		);
 		$block_content = CSS::add_responsive_styles(
 			$block_content,
 			$block,
-			$this->config['block_settings']['responsive']
+			$this->responsive_settings
 		);
 
 		return $block_content;

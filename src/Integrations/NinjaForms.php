@@ -2,16 +2,12 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\Integrations;
+namespace Blockify\Framework\Integrations;
 
-use Blockify\Core\Interfaces\Conditional;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
+use Blockify\Utilities\Interfaces\Conditional;
 use function wp_dequeue_style;
 
-class NinjaForms implements Hookable, Conditional {
-
-	use HookAnnotations;
+class NinjaForms implements Conditional {
 
 	/**
 	 * Condition.

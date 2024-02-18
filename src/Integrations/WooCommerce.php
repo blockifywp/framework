@@ -2,15 +2,14 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\Integrations;
+namespace Blockify\Framework\Integrations;
 
-use Blockify\Core\Interfaces\Conditional;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Providers\Data;
+use Blockify\Utilities\Interfaces\Conditional;
 use WP_Block_Patterns_Registry;
 use WP_Block_Template;
 use function add_action;
 use function class_exists;
+use function get_template;
 use function remove_action;
 use function str_contains;
 
@@ -19,27 +18,7 @@ use function str_contains;
  *
  * @since 1.0.0
  */
-class WooCommerce implements Hookable, Conditional {
-
-	/**
-	 * Theme or plugin data.
-	 *
-	 * @var Data
-	 */
-	private Data $data;
-
-	/**
-	 * WooCommerce constructor.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param Data $data Theme or plugin data.
-	 *
-	 * @return void
-	 */
-	public function __construct( Data $data ) {
-		$this->data = $data;
-	}
+class WooCommerce implements Conditional {
 
 	/**
 	 * Condition.
@@ -107,11 +86,12 @@ class WooCommerce implements Hookable, Conditional {
 		}
 
 		$woocommerce = class_exists( 'WooCommerce' );
+		$template    = get_template();
 
 		foreach ( $query_result as $index => $wp_block_template ) {
 			$slug = $wp_block_template->slug;
 
-			if ( $this->data->slug !== $wp_block_template->theme ) {
+			if ( $template !== $wp_block_template->theme ) {
 				continue;
 			}
 

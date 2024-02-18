@@ -2,15 +2,13 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_diff;
 use function esc_attr;
@@ -23,9 +21,7 @@ use function wp_get_global_settings;
  *
  * @since 1.0.0
  */
-class BoxShadow implements Hookable, Renderable, Styleable {
-
-	use HookAnnotations;
+class BoxShadow implements Renderable, Styleable {
 
 	/**
 	 * Adds box shadow to blocks.
@@ -163,12 +159,21 @@ class BoxShadow implements Hookable, Renderable, Styleable {
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
-		global $template_html;
+		$styles->add_callback( [ $this, 'get_inline_css' ] );
+	}
 
-		$is_editor = is_admin() && ! wp_doing_ajax();
-		$settings  = wp_get_global_settings();
-		$presets   = $settings['shadow']['presets']['theme'] ?? [];
-		$style     = [];
+	/**
+	 * Gets inline CSS.
+	 *
+	 * @param string $template_html The template HTML.
+	 * @param bool   $load_all      Whether to load all.
+	 *
+	 * @return string
+	 */
+	public function get_inline_css( string $template_html, bool $load_all ): string {
+		$settings = wp_get_global_settings();
+		$presets  = $settings['shadow']['presets']['theme'] ?? [];
+		$style    = [];
 
 		foreach ( $presets as $preset ) {
 			$slug   = $preset['slug'] ?? null;
@@ -178,7 +183,7 @@ class BoxShadow implements Hookable, Renderable, Styleable {
 				continue;
 			}
 
-			if ( ! $is_editor && ! str_contains( $template_html ?? '', "has-{$slug}" ) ) {
+			if ( ! $load_all && ! str_contains( $template_html, "has-{$slug}" ) ) {
 				continue;
 			}
 
@@ -191,9 +196,7 @@ class BoxShadow implements Hookable, Renderable, Styleable {
 			$css = 'body{' . CSS::array_to_string( $style ) . '}';
 		}
 
-		$styles->add()
-			->handle( $styles->prefix )
-			->inline_css( static fn(): string => $css );
+		return $css;
 	}
 
 }

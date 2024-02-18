@@ -2,11 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use WP_Block_Type_Registry;
 use function add_filter;
@@ -38,9 +36,7 @@ use function strtolower;
  *
  * @since 1.0.0
  */
-class TemplateTags implements Hookable, Renderable {
-
-	use HookAnnotations;
+class TemplateTags implements Renderable {
 
 	/**
 	 * Allow custom data to be rendered in blocks.

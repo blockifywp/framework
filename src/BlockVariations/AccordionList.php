@@ -2,14 +2,12 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockVariations;
+namespace Blockify\Framework\BlockVariations;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
-use Blockify\Core\Utilities\Str;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Utilities\Str;
 use DOMElement;
 use WP_Block;
 
@@ -18,9 +16,7 @@ use WP_Block;
  *
  * @since 1.0.0
  */
-class AccordionList implements Renderable, Hookable {
-
-	use HookAnnotations;
+class AccordionList implements Renderable {
 
 	/**
 	 * Renders list block as an accordion.

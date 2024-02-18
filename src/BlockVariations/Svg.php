@@ -2,14 +2,12 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockVariations;
+namespace Blockify\Framework\BlockVariations;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
-use Blockify\Core\Utilities\Str;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Utilities\Str;
 use WP_Block;
 use function esc_attr;
 use function explode;
@@ -24,9 +22,7 @@ use function trim;
  *
  * @since 1.0.0
  */
-class Svg implements Hookable, Renderable {
-
-	use HookAnnotations;
+class Svg implements Renderable {
 
 	/**
 	 * Render SVG block variation.

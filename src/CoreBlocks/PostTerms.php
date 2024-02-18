@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_key_last;
 use function array_unique;
@@ -31,9 +29,8 @@ use function trim;
  *
  * @since 1.0.0
  */
-class PostTerms implements Hookable, Renderable {
+class PostTerms implements Renderable {
 
-	use HookAnnotations;
 
 	/**
 	 * Modifies front end HTML output of block.

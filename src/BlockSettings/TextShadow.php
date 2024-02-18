@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_unique;
 use function esc_attr;
@@ -19,9 +17,7 @@ use function wp_get_global_settings;
  *
  * @since 1.0.0
  */
-class TextShadow implements Hookable, Renderable {
-
-	use HookAnnotations;
+class TextShadow implements Renderable {
 
 	/**
 	 * Adds text shadow to blocks.

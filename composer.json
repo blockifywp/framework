@@ -1,14 +1,14 @@
 {
   "name": "blockify/framework",
-  "description": "Blockify framework package.",
+  "description": "WordPress block theme framework.",
   "license": "GPL-2.0-or-later",
+  "type": "library",
   "authors": [
     {
       "name": "Blockify",
       "homepage": "https://blockifywp.com"
     }
   ],
-  "type": "library",
   "minimum-stability": "dev",
   "config": {
     "optimize-autoloader": true,
@@ -17,9 +17,19 @@
   "autoload": {
     "psr-4": {
       "Blockify\\Framework\\": "src/"
-    }
+    },
+    "classmap": [
+      "src/Blockify.php"
+    ]
   },
   "require": {
-    "psr/container": "^2.0@dev"
-  }
+    "php": ">=7.4",
+    "blockify/utilities": "dev-main"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "git@github.com:blockifywp/utilities.git"
+    }
+  ]
 }

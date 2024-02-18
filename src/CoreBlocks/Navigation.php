@@ -2,15 +2,13 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_keys;
 use function explode;
@@ -30,9 +28,7 @@ use function wp_list_pluck;
  *
  * @since 1.0.0
  */
-class Navigation implements Hookable, Renderable, Styleable {
-
-	use HookAnnotations;
+class Navigation implements Renderable, Styleable {
 
 	/**
 	 * Modifies front end HTML output of block.
@@ -158,9 +154,26 @@ class Navigation implements Hookable, Renderable, Styleable {
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
+		$styles->add_file( 'core-blocks/navigation.css', [ 'wp-block-navigation__submenu-container' ] );
+		$styles->add_callback( [ $this, 'get_submenu_styles' ] );
+	}
+
+	/**
+	 * Returns submenu styles.
+	 *
+	 * @param string $template_html Template HTML.
+	 * @param bool   $load_all      Load all styles.
+	 *
+	 * @return string
+	 */
+	public function get_submenu_styles( string $template_html, bool $load_all ): string {
+		if ( ! $load_all && ! str_contains( $template_html, 'wp-block-navigation__submenu-container' ) ) {
+			return '';
+		}
+
 		$global_styles = wp_get_global_styles();
 		$border        = $global_styles['blocks']['core/navigation-submenu']['border'] ?? [];
-		$style         = [];
+		$styles        = [];
 
 		foreach ( [ 'top', 'right', 'bottom', 'left' ] as $side ) {
 			if ( ! isset( $border[ $side ] ) ) {
@@ -168,36 +181,31 @@ class Navigation implements Hookable, Renderable, Styleable {
 			}
 
 			if ( $border[ $side ]['width'] ?? '' ) {
-				$style["border-$side-width"] = $border[ $side ]['width'];
+				$styles["border-$side-width"] = $border[ $side ]['width'];
 			}
 
 			if ( $border[ $side ]['style'] ?? '' ) {
-				$style["border-$side-style"] = $border[ $side ]['style'];
+				$styles["border-$side-style"] = $border[ $side ]['style'];
 			}
 
 			if ( $border[ $side ]['color'] ?? '' ) {
-				$style["border-$side-color"] = CSS::format_custom_property( $border[ $side ]['color'] );
+				$styles["border-$side-color"] = CSS::format_custom_property( $border[ $side ]['color'] );
 			}
 		}
 
 		$radius = $border['radius'] ?? null;
 
 		if ( $radius ) {
-			$style['border-radius'] = CSS::format_custom_property( $radius );
+			$styles['border-radius'] = CSS::format_custom_property( $radius );
 		}
 
 		$css = '';
 
-		if ( $style ) {
-			$css = '.wp-block-navigation-submenu{border:0}.wp-block-navigation .wp-block-navigation-item .wp-block-navigation__submenu-container{' . CSS::array_to_string( $style ) . '}';
+		if ( $styles ) {
+			$css = '.wp-block-navigation-submenu{border:0}.wp-block-navigation .wp-block-navigation-item .wp-block-navigation__submenu-container{' . CSS::array_to_string( $styles ) . '}';
 		}
 
-		$styles->add()
-			->handle( 'blockify-navigation' )
-			->src( 'assets/css/navigation.css' )
-			->inline_css( static fn(): string => $css )
-			->condition( static fn( string $template_html ): bool => str_contains( $template_html, 'wp-block-navigation__submenu-container' ) );
-
+		return $css;
 	}
 
 }

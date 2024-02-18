@@ -2,14 +2,12 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Conditional;
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Conditional;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function do_blocks;
 use function esc_html__;
@@ -24,9 +22,7 @@ use function sanitize_title;
  *
  * @since 1.0.0
  */
-class TableOfContents implements Hookable, Renderable, Conditional {
-
-	use HookAnnotations;
+class TableOfContents implements Renderable, Conditional {
 
 	/**
 	 * Condition.

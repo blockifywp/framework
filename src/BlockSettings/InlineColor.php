@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\BlockSettings;
+namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use DOMElement;
 use WP_Block;
 use function explode;
@@ -20,9 +18,7 @@ use function str_contains;
  *
  * @since 1.0.0
  */
-class InlineColor implements Hookable, Renderable {
-
-	use HookAnnotations;
+class InlineColor implements Renderable {
 
 	/**
 	 * Renders custom properties for inline colors.

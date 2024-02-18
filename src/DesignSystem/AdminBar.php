@@ -2,21 +2,18 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Traits\HookAnnotations;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use function is_admin_bar_showing;
 
 /**
  * Admin bar.
  *
  * @since 1.0.0
  */
-class AdminBar implements Hookable, Styleable {
-
-	use HookAnnotations;
+class AdminBar implements Styleable {
 
 	/**
 	 * Registers service with access to provider.
@@ -28,10 +25,11 @@ class AdminBar implements Hookable, Styleable {
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
-		$styles->add()
-			->handle( 'admin-bar' )
-			->src( 'components/admin-bar.css' )
-			->condition( static fn(): bool => is_admin_bar_showing() );
+		$styles->add_file(
+			'components/admin-bar.css',
+			[],
+			is_admin_bar_showing()
+		);
 	}
 
 	/**

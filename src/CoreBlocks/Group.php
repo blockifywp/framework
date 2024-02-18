@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_diff;
 use function esc_attr;
@@ -21,9 +19,7 @@ use function in_array;
  *
  * @since 1.0.0
  */
-class Group implements Hookable, Renderable {
-
-	use HookAnnotations;
+class Group implements Renderable {
 
 	/**
 	 * Modifies front end HTML output of block.

@@ -1,25 +1,30 @@
-# Blockify Extensions
+# Blockify Framework
 
-This package contains extensions for Blockify themes and plugins.
+This package contains the Blockify block theme framework for WordPress. It is a
+collection of PHP, JS, and CSS files that extend the block editor.
 
 ## Installation
 
 ```bash
-composer require blockify/extensions
+composer require blockify/framework
 ```
 
-If you only need the JS and CSS files, this package can also be installed with NPM:
+If you only need the JS and CSS files, this package can also be installed with
+NPM:
 
 ```bash
-npm install @blockifywp/extensions
+npm install @blockifywp/framework
 ```
 
 ## Usage
 
 ### PHP
 
-Requiring Composer's autoloader will automatically set everything up for you:
+First, require Composer's autoloader and then register the framework with
+WordPress:
 
 ```php
 require_once __DIR__ . '/vendor/autoload.php';
+
+Blockify::register( __FILE__ );
 ```

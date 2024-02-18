@@ -2,12 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
 use function apply_filters;
 use function array_merge;
+use function get_template_directory;
 use function is_readable;
 
 /**
@@ -15,9 +14,7 @@ use function is_readable;
  *
  * @since 1.0.0
  */
-class SystemFonts implements Hookable {
-
-	use HookAnnotations;
+class SystemFonts {
 
 	/**
 	 * Add system fonts.
@@ -37,7 +34,7 @@ class SystemFonts implements Hookable {
 		if ( ! $theme_fonts && ! $added ) {
 			$added = true;
 
-			$framework_theme_json_file = get_dir() . 'theme.json';
+			$framework_theme_json_file = get_template_directory() . '/theme.json';
 
 			if ( ! is_readable( $framework_theme_json_file ) ) {
 				return $theme_json;

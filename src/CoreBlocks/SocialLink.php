@@ -2,25 +2,22 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Icon;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function esc_attr;
-use function file_get_contents;
 
 /**
  * SocialLink class.
  *
  * @since 1.0.0
  */
-class SocialLink implements Hookable, Renderable {
+class SocialLink implements Renderable {
 
-	use HookAnnotations;
 
 	/**
 	 * Modifies front end HTML output of block.
@@ -73,7 +70,7 @@ class SocialLink implements Hookable, Renderable {
 			}
 
 			// TODO: New svg location.
-			$svg_dom = DOM::create( file_get_contents( get_dir() . 'assets/svg/social/slack.svg' ) );
+			$svg_dom = DOM::create( Icon::get_svg( 'social', 'slack' ) );
 			$svg     = DOM::get_element( 'svg', $svg_dom );
 
 			$svg->setAttribute( 'fill', 'currentColor' );

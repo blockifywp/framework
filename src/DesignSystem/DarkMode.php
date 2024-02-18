@@ -2,19 +2,18 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\Color;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\JSON;
-use Blockify\Core\Utilities\Str;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\Color;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\JSON;
+use Blockify\Utilities\Str;
 use function array_diff;
 use function array_replace;
 use function array_unique;
+use function explode;
 use function filter_input;
 use function in_array;
 use function is_null;
@@ -29,9 +28,60 @@ use const INPUT_GET;
  *
  * @since 0.9.10
  */
-class DarkMode implements Hookable, Styleable {
+class DarkMode implements Styleable {
 
-	use HookAnnotations;
+	/**
+	 * Color shade map.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var array
+	 */
+	private array $map = [
+		'primary' => [
+			950 => 25,
+			900 => 50,
+			800 => 100,
+			700 => 200,
+			600 => 300,
+			500 => 400,
+			400 => 500,
+			300 => 600,
+			200 => 700,
+			100 => 800,
+			50  => 900,
+			25  => 950,
+		],
+		'neutral' => [
+			950 => 0,
+			900 => 50,
+			800 => 100,
+			700 => 200,
+			600 => 300,
+			500 => 400,
+			400 => 500,
+			300 => 600,
+			200 => 700,
+			100 => 800,
+			50  => 900,
+			0   => 950,
+		],
+		'success' => [
+			600 => 100,
+			500 => 500,
+			100 => 600,
+		],
+		'warning' => [
+			600 => 100,
+			500 => 500,
+			100 => 600,
+		],
+		'error'   => [
+			600 => 100,
+			500 => 500,
+			100 => 600,
+		],
+	];
 
 	/**
 	 * Custom properties.
@@ -125,52 +175,6 @@ class DarkMode implements Hookable, Styleable {
 		$default_styles  = [];
 		$opposite_styles = [];
 
-		$maps = [
-			'primary' => [
-				950 => 25,
-				900 => 50,
-				800 => 100,
-				700 => 200,
-				600 => 300,
-				500 => 400,
-				400 => 500,
-				300 => 600,
-				200 => 700,
-				100 => 800,
-				50  => 900,
-				25  => 950,
-			],
-			'neutral' => [
-				950 => 0,
-				900 => 50,
-				800 => 100,
-				700 => 200,
-				600 => 300,
-				500 => 400,
-				400 => 500,
-				300 => 600,
-				200 => 700,
-				100 => 800,
-				50  => 900,
-				0   => 950,
-			],
-			'success' => [
-				600 => 100,
-				500 => 500,
-				100 => 600,
-			],
-			'warning' => [
-				600 => 100,
-				500 => 500,
-				100 => 600,
-			],
-			'error'   => [
-				600 => 100,
-				500 => 500,
-				100 => 600,
-			],
-		];
-
 		foreach ( $colors as $slug => $value ) {
 			$explode = explode( '-', $slug );
 			$name    = $explode[0] ?? '';
@@ -182,7 +186,7 @@ class DarkMode implements Hookable, Styleable {
 
 			$default_styles["--wp--preset--color--{$slug}"] = $value;
 
-			$opposite_shade = $maps[ $name ][ $shade ] ?? '';
+			$opposite_shade = $this->map[ $name ][ $shade ] ?? '';
 			$opposite_value = $colors[ $name . '-' . $opposite_shade ] ?? '';
 
 			if ( $opposite_value ) {
@@ -205,9 +209,7 @@ class DarkMode implements Hookable, Styleable {
 		$css = "html .is-style-{$default_mode}{" . CSS::array_to_string( $default_styles ) . '}';
 		$css .= "html .is-style-{$opposite_mode}{" . CSS::array_to_string( $opposite_styles ) . '}';
 
-		$styles->add()->inline_css(
-			static fn(): string => $css
-		);
+		$styles->add_string( $css );
 	}
 
 }

@@ -2,21 +2,26 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Utilities\CSS;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\CSS;
 use function str_contains;
 use function str_replace;
 use function wp_get_global_settings;
 
+/**
+ * Conic gradient.
+ *
+ * @since 1.0.0
+ */
 class ConicGradient implements Styleable {
 
 	/**
 	 * Converts custom linear or radial gradient into conic gradient.
 	 *
-	 * @since 0.9.10
+	 * @since 1.0.0
 	 *
 	 * @param Styles $styles Styles.
 	 *
@@ -45,9 +50,7 @@ class ConicGradient implements Styleable {
 
 		$css = 'body{' . CSS::array_to_string( $css ) . '}';
 
-		$styles->add()
-			->inline_css( static fn(): string => $css )
-			->condition( static fn( string $template_html ): bool => str_contains( $template_html, 'custom-conic-' ) );
+		$styles->add_string( $css, [ 'custom-conic-' ] );
 	}
 
 }

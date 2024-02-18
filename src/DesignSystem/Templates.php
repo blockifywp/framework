@@ -2,10 +2,8 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Traits\HookAnnotations;
 use function array_unshift;
 use function file_exists;
 use function get_post_type;
@@ -20,9 +18,7 @@ use function is_search;
  *
  * @since 1.0.0
  */
-class Templates implements Hookable {
-
-	use HookAnnotations;
+class Templates {
 
 	/**
 	 * Updates search template hierarchy.

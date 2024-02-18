@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\DOM;
-use Blockify\Core\Utilities\Str;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Utilities\Str;
 use WP_Block;
 use function explode;
 use function implode;
@@ -18,9 +16,7 @@ use function implode;
  *
  * @since 1.0.0
  */
-class Calendar implements Hookable, Renderable {
-
-	use HookAnnotations;
+class Calendar implements Renderable {
 
 	/**
 	 * Render core/calendar block.

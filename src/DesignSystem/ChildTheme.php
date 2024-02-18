@@ -2,11 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\DesignSystem;
+namespace Blockify\Framework\DesignSystem;
 
-use Blockify\Core\Interfaces\Styleable;
-use Blockify\Core\Services\Assets\Styles;
-use Blockify\Core\Utilities\Str;
+use Blockify\Framework\InlineAssets\Styleable;
+use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\Str;
 use function file_exists;
 use function file_get_contents;
 use function get_stylesheet_directory;
@@ -44,8 +44,6 @@ class ChildTheme implements Styleable {
 			$content
 		);
 
-		$styles->add()
-			->handle( 'child-theme' )
-			->inline_css( static fn(): string => $css );
+		$styles->add_string( $css );
 	}
 }

@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace Blockify\Extensions\CoreBlocks;
+namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Core\Interfaces\Hookable;
-use Blockify\Core\Interfaces\Renderable;
-use Blockify\Core\Traits\HookAnnotations;
-use Blockify\Core\Utilities\CSS;
-use Blockify\Core\Utilities\DOM;
+use Blockify\Utilities\CSS;
+use Blockify\Utilities\DOM;
+use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function esc_attr;
 use function esc_html;
@@ -22,9 +20,7 @@ use function is_home;
  *
  * @since 1.0.0
  */
-class QueryTitle implements Hookable, Renderable {
-
-	use HookAnnotations;
+class QueryTitle implements Renderable {
 
 	/**
 	 * Renders the Archive Title block.
