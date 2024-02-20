@@ -4,7 +4,6 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\DesignSystem;
 
-use function array_merge;
 use function is_admin;
 use function str_replace;
 
@@ -27,20 +26,19 @@ class Layout {
 	 * @return mixed
 	 */
 	public function fix_editor_layout_sizes( $theme_json ) {
+		if ( is_admin() ) {
+			return $theme_json;
+		}
+
 		$default      = $theme_json->get_data();
 		$new          = [];
 		$content_size = $default['settings']['layout']['contentSize'] ?? 'min(calc(100dvw - var(--wp--preset--spacing--lg,2rem)), 720px)';
 		$wide_size    = $default['settings']['layout']['wideSize'] ?? 'min(calc(100dvw - var(--wp--preset--spacing--lg,2rem)), 1200px)';
 
-		if ( is_admin() ) {
-			$content_size = str_replace( 'dvw', '%', $content_size );
-			$wide_size    = str_replace( 'dvw', '%', $wide_size );
-		}
+		$new['settings']['layout']['contentSize'] = str_replace( '%', 'dvw', $content_size );
+		$new['settings']['layout']['wideSize']    = str_replace( '%', 'dvw', $wide_size );
 
-		$new['settings']['layout']['contentSize'] = $content_size;
-		$new['settings']['layout']['wideSize']    = $wide_size;
-
-		$theme_json->update_with( array_merge( $default, $new ) );
+		$theme_json->update_with( $new );
 
 		return $theme_json;
 	}

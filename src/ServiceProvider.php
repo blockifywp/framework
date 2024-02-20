@@ -25,7 +25,7 @@ class ServiceProvider implements Registerable {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @var array
+	 * @var string[]
 	 */
 	private array $services = [
 		BlockSettings\Animation::class,

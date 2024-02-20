@@ -93,7 +93,7 @@ class EditorAssets {
 	/**
 	 * Enqueue editor styles.
 	 *
-	 * @hook enqueue_block_assets
+	 * @hook enqueue_block_assets 11
 	 *
 	 * @return void
 	 */

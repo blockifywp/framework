@@ -25,11 +25,5 @@
   "require": {
     "php": ">=7.4",
     "blockify/utilities": "dev-main"
-  },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "git@github.com:blockifywp/utilities.git"
-    }
-  ]
+  }
 }
