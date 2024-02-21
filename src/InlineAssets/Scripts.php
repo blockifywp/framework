@@ -42,7 +42,10 @@ class Scripts implements Inlinable {
 		wp_register_script( $this->handle, '', [], '', true );
 		wp_enqueue_script( $this->handle );
 		wp_add_inline_script( $this->handle, $js );
-		wp_localize_script( $this->handle, 'blockify', $data );
+
+		if ( $data ) {
+			wp_localize_script( $this->handle, 'blockify', $data );
+		}
 	}
 
 	/**

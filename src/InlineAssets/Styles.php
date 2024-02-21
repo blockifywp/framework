@@ -26,7 +26,7 @@ class Styles implements Inlinable {
 	/**
 	 * Enqueue inline styles.
 	 *
-	 * @hook enqueue_block_assets
+	 * @hook wp_enqueue_scripts 11
 	 *
 	 * @return void
 	 */

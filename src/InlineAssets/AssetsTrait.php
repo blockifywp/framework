@@ -218,10 +218,14 @@ trait AssetsTrait {
 		}
 
 		foreach ( $this->files as $file => $args ) {
-			$strings   = $args[0] ?? [];
-			$condition = $args[1] ?? true;
+			$strings = $args[0] ?? [];
 
-			if ( $load_all || ! $strings || Str::contains_any( $template_html, ...$strings ) || $condition ) {
+			// Skip if additional condition is not met.
+			if ( isset( $args[1] ) && ! $args[1] ) {
+				continue;
+			}
+
+			if ( $load_all || ! $strings || Str::contains_any( $template_html, ...$strings ) ) {
 				if ( file_exists( $this->dir . $file ) ) {
 					$assets[ $file ] = file_get_contents( $this->dir . $file );
 				}
