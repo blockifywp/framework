@@ -113,7 +113,7 @@ SVG;
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
-		$styles->add_file( 'extensions/copy-to-clipboard.css', [ 'copy-to-clipboard' ] );
+		$styles->add_file( 'block-extensions/copy-to-clipboard.css', [ 'copy-to-clipboard' ] );
 	}
 
 }

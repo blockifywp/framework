@@ -55,7 +55,7 @@ class EditorAssets {
 	/**
 	 * Enqueue editor scripts.
 	 *
-	 * @hook enqueue_block_assets 11
+	 * @hook enqueue_block_editor_assets 11
 	 *
 	 * @return void
 	 */
@@ -93,7 +93,7 @@ class EditorAssets {
 	/**
 	 * Enqueue editor styles.
 	 *
-	 * @hook enqueue_block_assets 11
+	 * @hook enqueue_block_editor_assets 11
 	 *
 	 * @return void
 	 */
@@ -110,8 +110,7 @@ class EditorAssets {
 			$handle,
 			$this->styles->url . 'editor.css',
 			[],
-			Debug::is_enabled() ? time() : '1.0.0',
-			true
+			Debug::is_enabled() ? time() : '1.0.0'
 		);
 
 		wp_enqueue_style( $handle );
