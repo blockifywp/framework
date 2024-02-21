@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\InlineAssets;
 
+use Blockify\Utilities\Path;
 use function apply_filters;
 use function is_admin;
 use function wp_add_inline_style;
@@ -20,7 +21,7 @@ class Styles implements Inlinable {
 
 	use AssetsTrait;
 
-	private string $dynamic_styles_url = 'https://blockify-dynamic-styles';
+	public const DYNAMIC_URL = 'https://blockify-dynamic-styles';
 
 	/**
 	 * Enqueue inline styles.
@@ -53,13 +54,14 @@ class Styles implements Inlinable {
 	 * @return void
 	 */
 	public function add_editor_styles(): void {
-		$blocks = glob( $this->dir . 'core-blocks/*.css' );
+		$blocks      = glob( $this->dir . 'core-blocks/*.css' );
+		$vendor_path = Path::get_parts( $this->dir, -5 );
 
 		foreach ( $blocks as $block ) {
-			add_editor_style( 'vendor/blockify/extensions/public/css/core-blocks/' . basename( $block ) );
+			add_editor_style( $vendor_path . '/core-blocks/' . basename( $block ) );
 		}
 
-		add_editor_style( $this->dynamic_styles_url );
+		add_editor_style( static::DYNAMIC_URL );
 	}
 
 	/**
@@ -76,7 +78,7 @@ class Styles implements Inlinable {
 	 * @return array|bool
 	 */
 	public function generate_dynamic_styles( $response, array $parsed_args, string $url ) {
-		if ( $url === $this->dynamic_styles_url ) {
+		if ( $url === static::DYNAMIC_URL ) {
 			$css = $this->get_inline_assets( '', true );
 
 			$response = [
