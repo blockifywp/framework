@@ -124,6 +124,7 @@ class BaseCss implements Styleable {
 			'aspect-ratio'  => [ 'has-aspect-ratio-' ],
 			'box-shadow'    => [ 'has-box-shadow' ],
 			'gradient-mask' => [ '-gradient-background' ],
+			'inline-image'  => [ 'wp-image-' ],
 			'shadow'        => [ 'has-shadow', 'has-box-shadow', 'has-text-shadow' ],
 			'transform'     => [ 'has-transform' ],
 		];

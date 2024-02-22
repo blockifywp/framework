@@ -75,19 +75,14 @@ class BlockStyles implements Scriptable {
 			'core/quote'               => [ 'surface' ],
 		];
 
-		$dark_mode  = $global_settings['custom']['darkMode'] ?? null;
-		$light_mode = $global_settings['custom']['lightMode'] ?? null;
-
-		if ( $dark_mode || $light_mode ) {
-			$register['core/code'][]    = 'light';
-			$register['core/code'][]    = 'dark';
-			$register['core/column'][]  = 'light';
-			$register['core/column'][]  = 'dark';
-			$register['core/columns'][] = 'light';
-			$register['core/columns'][] = 'dark';
-			$register['core/group'][]   = 'light';
-			$register['core/group'][]   = 'dark';
-		}
+		$register['core/code'][]    = 'light';
+		$register['core/code'][]    = 'dark';
+		$register['core/column'][]  = 'light';
+		$register['core/column'][]  = 'dark';
+		$register['core/columns'][] = 'light';
+		$register['core/columns'][] = 'dark';
+		$register['core/group'][]   = 'light';
+		$register['core/group'][]   = 'dark';
 
 		// Values must be arrays.
 		$unregister = [

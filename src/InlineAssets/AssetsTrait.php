@@ -221,7 +221,7 @@ trait AssetsTrait {
 			$strings = $args[0] ?? [];
 
 			// Skip if additional condition is not met.
-			if ( isset( $args[1] ) && ! $args[1] ) {
+			if ( isset( $args[1] ) && ! $args[1] && ! Str::contains_any( $template_html, ...$strings ) ) {
 				continue;
 			}
 

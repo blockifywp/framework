@@ -7,6 +7,7 @@ namespace Blockify\Framework\DesignSystem;
 use Blockify\Framework\InlineAssets\Scripts;
 use Blockify\Framework\InlineAssets\Styles;
 use Blockify\Utilities\Debug;
+use function apply_filters;
 use function file_exists;
 use function is_admin;
 use function time;
@@ -83,10 +84,15 @@ class EditorAssets {
 
 		wp_enqueue_script( $handle );
 
+		$data = apply_filters(
+			'blockify_editor_data',
+			$this->scripts->get_data( '', true )
+		);
+
 		wp_localize_script(
 			$handle,
 			'blockify',
-			$this->scripts->get_data( '', true )
+			$data
 		);
 	}
 

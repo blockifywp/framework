@@ -13,11 +13,13 @@ use function get_stylesheet_directory;
 use function get_template_directory;
 use function glob;
 use function in_array;
+use function is_dir;
 use function ksort;
 use function register_block_pattern_category;
 use function remove_theme_support;
 use function str_replace;
 use function strtoupper;
+use function trailingslashit;
 use function ucwords;
 
 /**
@@ -128,13 +130,27 @@ class Patterns {
 	 * @return array
 	 */
 	private function get_pattern_dirs(): array {
-		$template   = get_template_directory() . '/patterns/*';
-		$stylesheet = get_stylesheet_directory() . '/patterns/*';
-
-		return array_unique( apply_filters( 'blockify_pattern_dirs', [
-			...glob( $template, GLOB_ONLYDIR ),
-			...glob( $stylesheet, GLOB_ONLYDIR ),
+		$dirs = array_unique( apply_filters( 'blockify_pattern_dirs', [
+			get_template_directory() . '/patterns',
+			get_stylesheet_directory() . '/patterns',
 		] ) );
+
+		$category_dirs = [];
+
+		foreach ( $dirs as $dir ) {
+			$dir = trailingslashit( $dir );
+
+			if ( ! is_dir( $dir ) ) {
+				continue;
+			}
+
+			$category_dirs = [
+				...$category_dirs,
+				...glob( $dir . '*', GLOB_ONLYDIR ),
+			];
+		}
+
+		return $category_dirs;
 	}
 
 }

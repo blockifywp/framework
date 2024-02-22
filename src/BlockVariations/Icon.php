@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace Blockify\Framework\BlockVariations;
 
 use Blockify\Framework\BlockSettings\Responsive;
+use Blockify\Utilities\Block;
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon as IconUtility;
@@ -57,14 +58,23 @@ class Icon implements Renderable {
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
 		$attrs    = $block['attrs'] ?? [];
-		$has_icon = ( $attrs['iconSet'] ?? '' ) && ( $attrs['iconName'] ?? '' ) || ( $attrs['iconSvgString'] ?? '' );
+		$set      = $attrs['iconSet'] ?? null;
+		$name     = $attrs['iconName'] ?? null;
+		$svg      = $attrs['iconSvgString'] ?? null;
+		$has_icon = ( ( $set && $name ) || $svg );
 
 		if ( ! $has_icon ) {
 			return $block_content;
 		}
 
-		$attrs    = $block['attrs'] ?? [];
-		$icon_set = $attrs['iconSet'] ?? strtolower( 'WordPress' );
+		$set     = $set ?? strtolower( 'WordPress' );
+		$name    = $name ?? 'star-empty';
+		$svg     = $svg ?? IconUtility::get_svg( $set, $name );
+		$classes = $attrs['className'] ?? '';
+
+		if ( str_contains( $classes, 'all-icons' ) ) {
+			return $this->render_all_icons( $set );
+		}
 
 		$block_content = ! $block_content ? '<figure class="wp-block-image is-style-icon"><img src="" alt=""/></figure>' : $block_content;
 		$dom           = DOM::create( $block_content );
@@ -76,7 +86,6 @@ class Icon implements Renderable {
 		}
 
 		$span         = DOM::change_tag_name( 'span', $img );
-		$icon_name    = $attrs['iconName'] ?? 'star-empty';
 		$gradient     = $attrs['gradient'] ?? null;
 		$span_classes = [ 'wp-block-image__icon' ];
 
@@ -88,12 +97,12 @@ class Icon implements Renderable {
 		$block_extras        = $this->responsive_settings;
 		$block_extra_classes = [];
 
-		foreach ( $block_extras as $name => $args ) {
-			$block_extra_classes[] = 'has-' . $args['property'];
-
-			if ( ! isset( $args['options'] ) ) {
+		foreach ( $block_extras as $index => $args ) {
+			if ( ! isset( $args['options'] ) || ! isset( $args['property'] ) || ! isset( $args['value'] ) ) {
 				continue;
 			}
+
+			$block_extra_classes[] = 'has-' . $args['property'];
 
 			foreach ( $args['options'] as $option ) {
 				$block_extra_classes[] = 'has-' . $args['property'] . '-' . $option['value'];
@@ -128,7 +137,7 @@ class Icon implements Renderable {
 			$figure_classes[] = "has-{$text_color}-color";
 		}
 
-		$aria_label = $img->getAttribute( 'alt' ) ? $img->getAttribute( 'alt' ) : str_replace( '-', ' ', $icon_name ) . __( ' icon', 'blockify' );
+		$aria_label = $img->getAttribute( 'alt' ) ? $img->getAttribute( 'alt' ) : str_replace( '-', ' ', $name ) . __( ' icon', 'blockify' );
 
 		$span->setAttribute( 'title', $attrs['title'] ?? $aria_label );
 
@@ -165,10 +174,8 @@ class Icon implements Renderable {
 			unset( $figure_styles[ $key ] );
 		}
 
-		$svg_string = $attrs['iconSvgString'] ?? IconUtility::get_svg( $icon_set, $icon_name );
-
-		if ( $gradient && $svg_string ) {
-			$span_styles['--wp--custom--icon--url'] = 'url(\'data:image/svg+xml;utf8,' . $svg_string . '\')';
+		if ( $gradient && $svg ) {
+			$span_styles['--wp--custom--icon--url'] = 'url(\'data:image/svg+xml;utf8,' . $svg . '\')';
 		} else {
 			unset( $span_styles['--wp--custom--icon--url'] );
 		}
@@ -194,7 +201,6 @@ class Icon implements Renderable {
 		}
 
 		if ( $gradient ) {
-
 			if ( $text_color || $custom_text_color ) {
 				$figure_styles['--wp--custom--icon--background'] = "var(--wp--preset--gradient--{$gradient})";
 			} else {
@@ -262,7 +268,7 @@ class Icon implements Renderable {
 		}
 
 		if ( ! $gradient ) {
-			$icon = IconUtility::get_svg( $icon_set, $icon_name, $size );
+			$icon = IconUtility::get_svg( $set, $name, $size );
 
 			if ( $icon ) {
 				$icon_dom      = DOM::create( $icon );
@@ -285,7 +291,64 @@ class Icon implements Renderable {
 		);
 
 		return $block_content;
+	}
 
+	/**
+	 * Displays grid of all icons in a set.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param string $set Icon set name.
+	 *
+	 * @return string
+	 */
+	private function render_all_icons( string $set = 'wordpress' ): string {
+		$icons        = IconUtility::get_icon_data( null )[ $set ] ?? [];
+		$inner_blocks = [];
+		$limit        = 300;
+
+		foreach ( $icons as $icon => $svg ) {
+			if ( $limit-- <= 0 ) {
+				break;
+			}
+
+			$inner_blocks[] = [
+				'blockName' => 'core/image',
+				'attrs'     => [
+					'className'     => 'is-style-icon',
+					'iconSet'       => $set,
+					'iconName'      => $icon,
+					'iconSvgString' => $svg,
+					'iconSize'      => '1em',
+				],
+			];
+		}
+
+		$block = [
+			'blockName'   => 'core/group',
+			'attrs'       => [
+				'style'     => [
+					'spacing'             => [
+						'blockGap' => 'var(--wp--preset--spacing--sm)',
+					],
+					'display'             => [
+						'all' => 'grid',
+					],
+					'gridTemplateColumns' => [
+						'all' => 'repeat(auto-fill, minmax(1.5em, 1fr))',
+					],
+				],
+				'fontSize'  => '24',
+				'textColor' => 'heading',
+				'layout'    => [
+					'type'        => 'flex',
+					'orientation' => 'grid',
+				],
+			],
+			'innerBlocks' => $inner_blocks,
+		];
+
+		return do_blocks( Block::get_html( $block ) );
 	}
 
 }
