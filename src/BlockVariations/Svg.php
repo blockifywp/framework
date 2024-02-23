@@ -6,6 +6,7 @@ namespace Blockify\Framework\BlockVariations;
 
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
+use Blockify\Utilities\Icon;
 use Blockify\Utilities\Interfaces\Renderable;
 use Blockify\Utilities\Str;
 use DOMDocument;
@@ -42,7 +43,7 @@ class Svg implements Renderable {
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
 		$attrs      = $block['attrs'] ?? [];
-		$svg_string = $attrs['style']['svgString'] ?? '';
+		$svg_string = Icon::sanitize_svg( $attrs['style']['svgString'] ?? '' );
 
 		if ( ! $svg_string ) {
 			return $block_content;

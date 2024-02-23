@@ -6,6 +6,7 @@ namespace Blockify\Framework\BlockSettings;
 
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
+use Blockify\Utilities\Icon;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_diff;
@@ -168,7 +169,8 @@ class InlineSvg implements Renderable {
 			return $block_content;
 		}
 
-		$svg = $dom->importNode( DOM::create( file_get_contents( $file ) )->documentElement, true );
+		$html = Icon::sanitize_svg( file_get_contents( $file ) );
+		$svg  = $dom->importNode( DOM::create( $html )->documentElement, true );
 
 		if ( ! method_exists( $svg, 'setAttribute' ) ) {
 			return $block_content;
