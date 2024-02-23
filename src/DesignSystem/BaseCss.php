@@ -125,6 +125,7 @@ class BaseCss implements Styleable {
 			'box-shadow'    => [ 'has-box-shadow' ],
 			'gradient-mask' => [ '-gradient-background' ],
 			'inline-image'  => [ 'wp-image-' ],
+			'on-click'      => [ 'onclick="' ],
 			'shadow'        => [ 'has-shadow', 'has-box-shadow', 'has-text-shadow' ],
 			'transform'     => [ 'has-transform' ],
 		];
@@ -173,6 +174,14 @@ class BaseCss implements Styleable {
 				'is-style-dark',
 				'hide-light-mode',
 				'hide-dark-mode',
+			],
+			'fade'      => [
+				'fade-top',
+				'fade-right',
+				'fade-bottom',
+				'fade-left',
+				'fade-horizontal',
+				'fade-vertical',
 			],
 			'flex'      => [
 				'flex',

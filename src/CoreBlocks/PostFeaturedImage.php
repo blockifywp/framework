@@ -70,6 +70,7 @@ class PostFeaturedImage implements Renderable {
 		$shadow_custom  = $attrs['style']['boxShadow'] ?? null;
 		$hover_custom   = $attrs['style']['boxShadow']['hover'] ?? null;
 		$border_radius  = $attrs['style']['border']['radius'] ?? null;
+		$margin         = $attrs['style']['spacing']['margin'] ?? null;
 
 		if ( $shadow_preset ) {
 			$figure_classes[] = 'has-shadow';
@@ -102,6 +103,10 @@ class PostFeaturedImage implements Renderable {
 
 		if ( $border_radius ) {
 			$figure_styles['border-radius'] = $border_radius;
+		}
+
+		if ( $margin ) {
+			$figure_styles = CSS::add_shorthand_property( $figure_styles, 'margin', $margin );
 		}
 
 		$img_classes = $img ? explode( ' ', $img->getAttribute( 'class' ) ) : [];

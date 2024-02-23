@@ -38,7 +38,7 @@ class DarkMode implements Styleable {
 	 * @var array
 	 */
 	private array $map = [
-		'primary' => [
+		'primary'   => [
 			950 => 25,
 			900 => 50,
 			800 => 100,
@@ -52,7 +52,21 @@ class DarkMode implements Styleable {
 			50  => 900,
 			25  => 950,
 		],
-		'neutral' => [
+		'secondary' => [
+			950 => 25,
+			900 => 50,
+			800 => 100,
+			700 => 200,
+			600 => 300,
+			500 => 400,
+			400 => 500,
+			300 => 600,
+			200 => 700,
+			100 => 800,
+			50  => 900,
+			25  => 950,
+		],
+		'neutral'   => [
 			950 => 0,
 			900 => 50,
 			800 => 100,
@@ -66,17 +80,17 @@ class DarkMode implements Styleable {
 			50  => 900,
 			0   => 950,
 		],
-		'success' => [
+		'success'   => [
 			600 => 100,
 			500 => 500,
 			100 => 600,
 		],
-		'warning' => [
+		'warning'   => [
 			600 => 100,
 			500 => 500,
 			100 => 600,
 		],
-		'error'   => [
+		'error'     => [
 			600 => 100,
 			500 => 500,
 			100 => 600,
@@ -161,19 +175,22 @@ class DarkMode implements Styleable {
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
-		$settings        = wp_get_global_settings();
-		$palette         = $settings['color']['palette']['theme'] ?? [];
-		$custom          = array_replace(
+		$settings          = wp_get_global_settings();
+		$palette           = $settings['color']['palette']['theme'] ?? [];
+		$custom            = array_replace(
 			JSON::compute_theme_vars( $settings['custom'] ?? [] ),
 			$this->custom_properties->get_custom_properties(),
 		);
-		$colors          = Color::get_color_values( $palette );
-		$gradients       = Color::get_color_values( $settings['color']['gradients']['theme'] ?? [], 'gradient' );
-		$system          = Color::get_system_colors();
-		$default_mode    = $settings['custom']['darkMode']['defaultMode'] ?? 'light';
-		$opposite_mode   = $default_mode === 'light' ? 'dark' : 'light';
-		$default_styles  = [];
-		$opposite_styles = [];
+		$colors            = Color::get_color_values( $palette );
+		$gradients         = Color::get_color_values( $settings['color']['gradients']['theme'] ?? [], 'gradient' );
+		$system            = Color::get_system_colors();
+		$light_settings    = $settings['custom']['lightMode'] ?? null;
+		$dark_settings     = $settings['custom']['darkMode'] ?? null;
+		$opposite_settings = $light_settings ?? $dark_settings ?? null;
+		$default_mode      = 'light';
+		$opposite_mode     = 'dark'; // $default_mode === 'light' ? 'dark' : 'light';
+		$default_styles    = [];
+		$opposite_styles   = [];
 
 		foreach ( $colors as $slug => $value ) {
 			$explode = explode( '-', $slug );
@@ -189,14 +206,21 @@ class DarkMode implements Styleable {
 			$opposite_shade = $this->map[ $name ][ $shade ] ?? '';
 			$opposite_value = $colors[ $name . '-' . $opposite_shade ] ?? '';
 
+			if ( isset( $opposite_settings['palette'][ $slug ] ) ) {
+				$opposite_value = $opposite_settings['palette'][ $slug ];
+			}
+
 			if ( $opposite_value ) {
 				$opposite_styles["--wp--preset--color--{$slug}"] = $opposite_value;
 			}
 		}
 
 		foreach ( $gradients as $slug => $value ) {
-			$default_styles["--wp--preset--gradient--{$slug}"]  = $value;
-			$opposite_styles["--wp--preset--gradient--{$slug}"] = $value;
+			$default_styles["--wp--preset--gradient--{$slug}"] = $value;
+
+			$opposite_value = $opposite_settings['gradients'][ $slug ] ?? $value;
+
+			$opposite_styles["--wp--preset--gradient--{$slug}"] = $opposite_value;
 		}
 
 		foreach ( $custom as $name => $value ) {
