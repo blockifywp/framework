@@ -294,6 +294,19 @@ class Icon implements Renderable {
 	}
 
 	/**
+	 * Registers icons rest route.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @hook  after_setup_theme
+	 *
+	 * @return void
+	 */
+	public function register_rest_route(): void {
+		IconUtility::register_rest_route();
+	}
+
+	/**
 	 * Displays grid of all icons in a set.
 	 *
 	 * @since 1.3.0

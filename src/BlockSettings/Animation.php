@@ -171,6 +171,11 @@ class Animation implements Renderable, Styleable, Scriptable {
 			'packery.js',
 			[ 'packery' ]
 		);
+
+		$scripts->add_file(
+			'typewriter.js',
+			[ 'has-typewriter-animation' ]
+		);
 	}
 
 	/**

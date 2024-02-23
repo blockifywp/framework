@@ -7,7 +7,6 @@ namespace Blockify\Framework\DesignSystem;
 use Blockify\Utilities\Pattern;
 use WP_Block_Patterns_Registry;
 use function apply_filters;
-use function array_unique;
 use function basename;
 use function get_stylesheet_directory;
 use function get_template_directory;
@@ -130,10 +129,10 @@ class Patterns {
 	 * @return array
 	 */
 	private function get_pattern_dirs(): array {
-		$dirs = array_unique( apply_filters( 'blockify_pattern_dirs', [
+		$dirs = apply_filters( 'blockify_pattern_dirs', [
 			get_template_directory() . '/patterns',
 			get_stylesheet_directory() . '/patterns',
-		] ) );
+		] );
 
 		$category_dirs = [];
 

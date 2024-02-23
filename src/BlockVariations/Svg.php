@@ -8,6 +8,8 @@ use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Interfaces\Renderable;
 use Blockify\Utilities\Str;
+use DOMDocument;
+use DOMElement;
 use WP_Block;
 use function esc_attr;
 use function explode;
@@ -39,7 +41,8 @@ class Svg implements Renderable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$svg_string = $block['attrs']['style']['svgString'] ?? '';
+		$attrs      = $block['attrs'] ?? [];
+		$svg_string = $attrs['style']['svgString'] ?? '';
 
 		if ( ! $svg_string ) {
 			return $block_content;
@@ -54,58 +57,12 @@ class Svg implements Renderable {
 		$link   = DOM::get_element( 'a', $figure );
 		$img    = DOM::get_element( 'img', $link ?? $figure );
 		$svg    = DOM::get_element( 'svg', $link ?? $figure );
-
-		$mask   = (bool) ( $block['attrs']['style']['maskSvg'] ?? false );
-		$width  = esc_attr( $block['attrs']['width'] ?? '' );
-		$height = esc_attr( $block['attrs']['height'] ?? '' );
+		$width  = esc_attr( $attrs['width'] ?? '' );
+		$height = esc_attr( $attrs['height'] ?? '' );
+		$mask   = (bool) ( $attrs['style']['maskSvg'] ?? false );
 
 		if ( $mask ) {
-			$span    = DOM::change_tag_name( 'span', $img );
-			$styles  = CSS::string_to_array( $span->getAttribute( 'style' ) );
-			$encoded = rawurlencode(
-				str_replace(
-					'"',
-					"'",
-					trim( $svg_string )
-				)
-			);
-
-			$styles['-webkit-mask-image'] = 'url("data:image/svg+xml;utf8,' . $encoded . '")';
-
-			if ( $width ) {
-				$unit = Str::contains_any( $width, 'px', 'em', 'rem', 'vh', 'vw', '%' ) ? '' : 'px';
-
-				$styles['width'] = $width . $unit;
-
-				$span->removeAttribute( 'width' );
-			}
-
-			if ( $height ) {
-				$unit = Str::contains_any( $height, 'px', 'em', 'rem', 'vh', 'vw', '%' ) ? '' : 'px';
-
-				$styles['height'] = $height . $unit;
-
-				$span->removeAttribute( 'height' );
-			}
-
-			$alt = $img->getAttribute( 'alt' );
-
-			if ( $alt ) {
-				$span->setAttribute( 'aria-label', esc_attr( $alt ) );
-				$span->removeAttribute( 'alt' );
-			}
-
-			$classes = explode( ' ', $span->getAttribute( 'class' ) );
-
-			$classes[] = 'wp-block-image__svg';
-
-			$span->setAttribute( 'class', implode( ' ', $classes ) );
-			$span->setAttribute( 'role', 'img' );
-			$span->removeAttribute( 'style' );
-			$span->setAttribute( 'style', CSS::array_to_string( $styles ) );
-			$span->removeAttribute( 'src' );
-
-			return $dom->saveHTML();
+			//return $this->render_mask( $img, $svg_string, $dom, $width, $height );
 		}
 
 		if ( $svg ) {
@@ -141,6 +98,66 @@ class Svg implements Renderable {
 		} else {
 			$figure->appendChild( $imported );
 		}
+
+		return $dom->saveHTML();
+	}
+
+	/**
+	 * Renders masked SVG.
+	 *
+	 * @param DOMElement  $img        Image element.
+	 * @param string      $svg_string SVG string.
+	 * @param DOMDocument $dom        DOM document.
+	 * @param string      $width      Image width.
+	 * @param string      $height     Image height.
+	 *
+	 * @return string
+	 */
+	public function render_mask( DOMElement $img, string $svg_string, DOMDocument $dom, string $width, string $height ): string {
+		$span    = DOM::change_tag_name( 'span', $img );
+		$styles  = CSS::string_to_array( $span->getAttribute( 'style' ) );
+		$encoded = rawurlencode(
+			str_replace(
+				'"',
+				"'",
+				trim( $svg_string )
+			)
+		);
+
+		$styles['-webkit-mask-image'] = 'url("data:image/svg+xml;utf8,' . $encoded . '")';
+
+		if ( $width ) {
+			$unit = Str::contains_any( $width, 'px', 'em', 'rem', 'vh', 'vw', '%' ) ? '' : 'px';
+
+			$styles['width'] = $width . $unit;
+
+			$span->removeAttribute( 'width' );
+		}
+
+		if ( $height ) {
+			$unit = Str::contains_any( $height, 'px', 'em', 'rem', 'vh', 'vw', '%' ) ? '' : 'px';
+
+			$styles['height'] = $height . $unit;
+
+			$span->removeAttribute( 'height' );
+		}
+
+		$alt = $img->getAttribute( 'alt' );
+
+		if ( $alt ) {
+			$span->setAttribute( 'aria-label', esc_attr( $alt ) );
+			$span->removeAttribute( 'alt' );
+		}
+
+		$classes = explode( ' ', $span->getAttribute( 'class' ) );
+
+		$classes[] = 'wp-block-image__svg';
+
+		$span->setAttribute( 'class', implode( ' ', $classes ) );
+		$span->setAttribute( 'role', 'img' );
+		$span->removeAttribute( 'style' );
+		$span->setAttribute( 'style', CSS::array_to_string( $styles ) );
+		$span->removeAttribute( 'src' );
 
 		return $dom->saveHTML();
 	}

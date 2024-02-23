@@ -48,6 +48,8 @@ class Search implements Renderable {
 		$show_icon           = ! $use_icon || ( $button_position === 'button-outside' || $button_position === 'no-button' );
 		$padding             = $block['attrs']['style']['spacing']['padding'] ?? [];
 		$margin              = $block['attrs']['style']['spacing']['margin'] ?? [];
+		$text_color          = $block['attrs']['textColor'] ?? '';
+		$text_custom         = $block['attrs']['style']['color']['text'] ?? '';
 		$background_color    = $block['attrs']['backgroundColor'] ?? '';
 		$background_custom   = $block['attrs']['style']['color']['background'] ?? '';
 		$input_background    = $block['attrs']['inputBackgroundColor'] ?? '';
@@ -126,6 +128,10 @@ class Search implements Renderable {
 
 		if ( $border['radius'] ?? '' ) {
 			$input_styles['border-radius'] = CSS::format_custom_property( $border['radius'] ?? '' );
+		}
+
+		if ( $text_color || $text_custom ) {
+			$input_styles['color'] = $text_color ?? $text_custom;
 		}
 
 		if ( $input_background ) {

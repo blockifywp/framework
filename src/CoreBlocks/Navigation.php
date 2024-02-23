@@ -56,8 +56,9 @@ class Navigation implements Renderable, Styleable {
 
 		$styles       = CSS::string_to_array( $nav->getAttribute( 'style' ) );
 		$classes      = explode( ' ', $nav->getAttribute( 'class' ) );
-		$overlay_menu = $block['attrs']['overlayMenu'] ?? true;
-		$filter       = $block['attrs']['style']['filter'] ?? null;
+		$attrs        = $block['attrs'] ?? [];
+		$overlay_menu = $attrs['overlayMenu'] ?? true;
+		$filter       = $attrs['style']['filter'] ?? null;
 
 		if ( $overlay_menu && $filter ) {
 			$filter_value = '';
@@ -74,7 +75,8 @@ class Navigation implements Renderable, Styleable {
 
 			$styles['--wp--custom--nav--filter'] = trim( $filter_value );
 
-			$background_color = $block['attrs']['backgroundColor'] ?? $block['attrs']['style']['color']['background'] ?? '';
+			// Overlay background color.
+			$background_color = $attrs['overlayBackgroundColor'] ?? $attrs['customOverlayBackgroundColor'] ?? '';
 
 			$global_settings = wp_get_global_settings();
 			$color_slugs     = wp_list_pluck( $global_settings['color']['palette']['theme'] ?? [], 'slug' );
@@ -98,7 +100,7 @@ class Navigation implements Renderable, Styleable {
 			$block_content = $dom->saveHTML();
 		}
 
-		$spacing = $block['attrs']['style']['spacing'] ?? null;
+		$spacing = $attrs['style']['spacing'] ?? null;
 
 		if ( ! $spacing ) {
 			return $block_content;
@@ -122,7 +124,12 @@ class Navigation implements Renderable, Styleable {
 			}
 		}
 
-		$styles = CSS::add_shorthand_property( $styles, '--wp--custom--nav--padding', $padding );
+		if ( $padding ) {
+			$padding_top    = CSS::format_custom_property( $padding['top'] ?? '' );
+			$padding_bottom = CSS::format_custom_property( $padding['bottom'] ?? '' );
+
+			$styles['--wp--custom--nav--padding'] = $padding_top ?: $padding_bottom;
+		}
 
 		if ( $styles ) {
 			$nav->setAttribute( 'style', CSS::array_to_string( $styles ) );
