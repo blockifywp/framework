@@ -6,6 +6,7 @@ namespace Blockify\Framework\CoreBlocks;
 
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
+use Blockify\Utilities\Icon;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function esc_attr;
@@ -188,7 +189,7 @@ class Search implements Renderable {
 		}
 
 		if ( $show_icon ) {
-			$svg_dom = DOM::create( get_icon( 'wordpress', 'search' ) );
+			$svg_dom = DOM::create( Icon::get_svg( 'wordpress', 'search' ) );
 			$svg     = DOM::get_element( 'svg', $svg_dom );
 
 			if ( ! $svg ) {

@@ -15,9 +15,14 @@ use function array_replace;
 use function array_unique;
 use function explode;
 use function filter_input;
+use function hexdec;
 use function in_array;
 use function is_null;
 use function is_string;
+use function ltrim;
+use function round;
+use function sprintf;
+use function substr;
 use function wp_get_global_settings;
 use const FILTER_SANITIZE_FULL_SPECIAL_CHARS;
 use const INPUT_COOKIE;
@@ -39,32 +44,32 @@ class DarkMode implements Styleable {
 	 */
 	private array $map = [
 		'primary'   => [
-			950 => 25,
-			900 => 50,
-			800 => 100,
-			700 => 200,
-			600 => 300,
-			500 => 400,
-			400 => 500,
-			300 => 600,
-			200 => 700,
-			100 => 800,
-			50  => 900,
-			25  => 950,
+			950 => 50,
+			900 => 100,
+			800 => 200,
+			700 => 300,
+			600 => 400,
+			500 => 500,
+			400 => 600,
+			300 => 700,
+			200 => 800,
+			100 => 900,
+			50  => 950,
+			25  => 1000,
 		],
 		'secondary' => [
-			950 => 25,
-			900 => 50,
-			800 => 100,
-			700 => 200,
-			600 => 300,
-			500 => 400,
-			400 => 500,
-			300 => 600,
-			200 => 700,
-			100 => 800,
-			50  => 900,
-			25  => 950,
+			950 => 50,
+			900 => 100,
+			800 => 200,
+			700 => 300,
+			600 => 400,
+			500 => 500,
+			400 => 600,
+			300 => 700,
+			200 => 800,
+			100 => 900,
+			50  => 950,
+			25  => 1000,
 		],
 		'neutral'   => [
 			950 => 0,
@@ -206,6 +211,10 @@ class DarkMode implements Styleable {
 			$opposite_shade = $this->map[ $name ][ $shade ] ?? '';
 			$opposite_value = $colors[ $name . '-' . $opposite_shade ] ?? '';
 
+			if ( ( (int) $opposite_shade ?? 0 ) === 1000 ) {
+				$opposite_value = $this->darken( $colors[ $name . '-950' ] ?? '', 50 );
+			}
+
 			if ( isset( $opposite_settings['palette'][ $slug ] ) ) {
 				$opposite_value = $opposite_settings['palette'][ $slug ];
 			}
@@ -234,6 +243,33 @@ class DarkMode implements Styleable {
 		$css .= "html .is-style-{$opposite_mode}{" . CSS::array_to_string( $opposite_styles ) . '}';
 
 		$styles->add_string( $css );
+	}
+
+	/**
+	 * Darkens a hex color by a given percentage.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $hex        Hex color.
+	 * @param int    $percentage Percentage.
+	 *
+	 * @return string
+	 */
+	private function darken( string $hex, int $percentage ): string {
+		$hex        = ltrim( $hex, '#' );
+		$percentage = $percentage / 100;
+
+		// Convert the hex color to RGB.
+		$r = hexdec( substr( $hex, 0, 2 ) );
+		$g = hexdec( substr( $hex, 2, 2 ) );
+		$b = hexdec( substr( $hex, 4, 2 ) );
+
+		// Reduce each color component by half (mix with 50% black).
+		$r = round( $r * $percentage );
+		$g = round( $g * $percentage );
+		$b = round( $b * $percentage );
+
+		return sprintf( "#%02x%02x%02x", $r, $g, $b );
 	}
 
 }
