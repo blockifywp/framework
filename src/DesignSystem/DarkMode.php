@@ -10,6 +10,7 @@ use Blockify\Utilities\Color;
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\JSON;
 use Blockify\Utilities\Str;
+use function apply_filters;
 use function array_diff;
 use function array_replace;
 use function array_unique;
@@ -138,7 +139,7 @@ class DarkMode implements Styleable {
 		$url_param       = filter_input( INPUT_GET, 'dark_mode', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$stylesheet_dir  = get_stylesheet_directory();
 		$global_settings = wp_get_global_settings();
-		$default_mode    = $global_settings['custom']['darkMode']['defaultMode'] ?? 'light';
+		$default_mode    = $this->get_default_mode( $global_settings );
 		$both_classes    = [ 'is-style-light', 'is-style-dark' ];
 
 		$classes[] = 'default-mode-' . $default_mode;
@@ -192,8 +193,8 @@ class DarkMode implements Styleable {
 		$light_settings    = $settings['custom']['lightMode'] ?? null;
 		$dark_settings     = $settings['custom']['darkMode'] ?? null;
 		$opposite_settings = $light_settings ?? $dark_settings ?? null;
-		$default_mode      = 'light';
-		$opposite_mode     = 'dark'; // $default_mode === 'light' ? 'dark' : 'light';
+		$default_mode      = $this->get_default_mode( $settings );
+		$opposite_mode     = $default_mode === 'light' ? 'dark' : 'light';
 		$default_styles    = [];
 		$opposite_styles   = [];
 
@@ -241,8 +242,26 @@ class DarkMode implements Styleable {
 
 		$css = "html .is-style-{$default_mode}{" . CSS::array_to_string( $default_styles ) . '}';
 		$css .= "html .is-style-{$opposite_mode}{" . CSS::array_to_string( $opposite_styles ) . '}';
+		$css .= "@media (prefers-color-scheme:$opposite_mode){body{" . CSS::array_to_string( $opposite_styles ) . "}}";
 
 		$styles->add_string( $css );
+	}
+
+	/**
+	 * Gets the default mode.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array $global_settings Global settings.
+	 *
+	 * @return string
+	 */
+	private function get_default_mode( array $global_settings ): string {
+		return apply_filters(
+			'blockify_default_mode',
+			isset( $global_settings['custom']['lightMode'] ) ? 'dark' : 'light',
+			$global_settings
+		);
 	}
 
 	/**
