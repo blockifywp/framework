@@ -20,6 +20,7 @@ use function implode;
 use function in_array;
 use function str_contains;
 use function str_replace;
+use function trim;
 use function wp_get_global_settings;
 
 /**
@@ -68,29 +69,64 @@ class Button implements Renderable {
 			return $block_content;
 		}
 
-		if ( str_contains( $block_content, 'is-style-outline' ) ) {
-			$dom    = DOM::create( $block_content );
-			$div    = DOM::get_element( 'div', $dom );
-			$anchor = DOM::get_element( 'a', $div );
+		$attrs      = $block['attrs'] ?? [];
+		$class_name = $attrs['className'] ?? '';
 
-			if ( $anchor ) {
-				$classes = explode( ' ', $anchor->getAttribute( 'class' ) );
-				$anchor->setAttribute(
-					'class',
-					implode(
-						' ',
-						[
-							...$classes,
-							'wp-element-button',
-						]
-					)
-				);
+		if ( str_contains( $class_name, 'is-style-outline' ) ) {
+			$dom = DOM::create( $block_content );
+			$div = DOM::get_element( 'div', $dom );
 
-				$block_content = $dom->saveHTML();
+			if ( ! $div ) {
+				$div = DOM::create_element( 'div', $dom );
+
+				$div->setAttribute( 'class', 'wp-block-button ' . $class_name );
+
+				$dom->appendChild( $div );
 			}
+
+			$link = DOM::get_element( 'a', $div );
+
+			if ( ! $link ) {
+				$link = DOM::create_element( 'a', $dom );
+
+				$div->appendChild( $link );
+			}
+
+			$classes = explode( ' ', $link->getAttribute( 'class' ) );
+			$styles  = CSS::string_to_array( $link->getAttribute( 'style' ) );
+
+			$classes[] = 'wp-element-button';
+			$classes[] = 'wp-block-button__link';
+
+			$text_color        = $attrs['textColor'] ?? null;
+			$custom_text_color = $attrs['style']['color']['text'] ?? null;
+
+			if ( $text_color || $custom_text_color ) {
+				$classes[] = 'has-text-color';
+			}
+
+			if ( $text_color ) {
+				$classes[] = 'has-' . $text_color . '-color';
+			}
+
+			if ( $custom_text_color ) {
+				$styles['color'] = $custom_text_color;
+			}
+
+			$link->setAttribute(
+				'class',
+				trim( implode(
+					' ',
+					array_unique( $classes )
+				) )
+			);
+
+			$link->setAttribute( 'style', CSS::array_to_string( $styles ) );
+
+			$block_content = $dom->saveHTML();
 		}
 
-		if ( str_contains( $block_content, '-border-' ) ) {
+		if ( isset( $attrs['style']['border'] ) || isset( $attrs['borderColor'] ) ) {
 			$global_settings = wp_get_global_settings();
 			$dom             = DOM::create( $block_content );
 			$div             = DOM::get_element( 'div', $dom );
@@ -98,10 +134,14 @@ class Button implements Renderable {
 
 			if ( ! $div ) {
 				$div = DOM::create_element( 'div', $dom );
+
+				$dom->appendChild( $div );
 			}
 
 			if ( ! $link ) {
 				$link = DOM::create_element( 'a', $dom );
+
+				$div->appendChild( $link );
 			}
 
 			$classes     = explode( ' ', $div->getAttribute( 'class' ) );
@@ -121,8 +161,8 @@ class Button implements Renderable {
 				}
 			}
 
-			$border_width = $block['attrs']['style']['border']['width'] ?? null;
-			$border_color = $block['attrs']['style']['border']['color'] ?? null;
+			$border_width = $attrs['style']['border']['width'] ?? null;
+			$border_color = $attrs['style']['border']['color'] ?? null;
 
 			$link_styles = CSS::string_to_array( $link->getAttribute( 'style' ) );
 
@@ -143,155 +183,15 @@ class Button implements Renderable {
 			$block_content = $dom->saveHTML();
 		}
 
-		$icon_set  = $block['attrs']['iconSet'] ?? '';
-		$icon_name = $block['attrs']['iconName'] ?? '';
+		$icon_set  = $attrs['iconSet'] ?? '';
+		$icon_name = $attrs['iconName'] ?? '';
 		$icon      = $icon_set && $icon_name ? Icon::get_svg( $icon_set, $icon_name ) : '';
 
 		if ( $icon ) {
-			$dom = DOM::create( $block_content );
-			$div = DOM::get_element( 'div', $dom );
-
-			if ( ! $div ) {
-				$div   = DOM::create_element( 'div', $dom );
-				$div   = DOM::node_to_element( $dom->appendChild( $div ) );
-				$class = esc_attr( $block['attrs']['className'] ?? '' );
-
-				$div->setAttribute( 'class', 'wp-block-button ' . $class );
-			}
-
-			$div_styles = CSS::string_to_array( $div->getAttribute( 'style' ) );
-
-			foreach ( $div_styles as $key => $style ) {
-				if ( str_contains( $key, '--wp--custom--icon--' ) ) {
-					unset( $div_styles[ $key ] );
-				}
-			}
-
-			$div->setAttribute( 'style', CSS::array_to_string( $div_styles ) );
-
-			$a = DOM::get_element( 'a', $div );
-
-			if ( ! $a ) {
-				$a = DOM::create_element( 'a', $dom );
-
-				$a->setAttribute( 'class', 'wp-block-button__link wp-element-button' );
-
-				$a = DOM::node_to_element( $div->appendChild( $a ) );
-			}
-
-			$svg_dom  = DOM::create( $icon );
-			$svg      = DOM::get_element( 'svg', $svg_dom );
-			$imported = DOM::node_to_element( $dom->importNode( $svg, true ) );
-			$gap      = $block['attrs']['style']['spacing']['blockGap'] ?? null;
-			$classes  = explode( ' ', $a->getAttribute( 'class' ) );
-			$styles   = CSS::string_to_array( $a->getAttribute( 'style' ) );
-
-			if ( $gap ) {
-				$styles['gap'] = CSS::format_custom_property( $gap );
-			}
-
-			$padding = $block['attrs']['style']['spacing']['padding'] ?? [];
-			$styles  = CSS::add_shorthand_property( $styles, 'padding', $padding );
-
-			$text_color = $block['attrs']['textColor'] ?? null;
-
-			if ( $text_color ) {
-				$styles['color'] = CSS::format_custom_property( $text_color );
-			}
-
-			$background_color = $block['attrs']['backgroundColor'] ?? null;
-
-			if ( $background_color ) {
-				$styles['background-color'] = CSS::format_custom_property( $background_color );
-				$classes[]                  = 'has-background';
-			}
-
-			$border_width = $block['attrs']['style']['border']['width'] ?? null;
-			$border_style = $block['attrs']['style']['border']['style'] ?? null;
-			$border_color = $block['attrs']['style']['border']['color'] ?? null;
-
-			if ( $border_width ) {
-				$styles['border-width'] = CSS::format_custom_property( $border_width );
-			}
-
-			if ( $border_style ) {
-				$styles['border-style'] = CSS::format_custom_property( $border_style );
-			}
-
-			if ( $border_color ) {
-				$styles['border-color'] = CSS::format_custom_property( $border_color );
-			}
-
-			if ( $styles ) {
-				$a->setAttribute( 'style', CSS::array_to_string( $styles ) );
-			}
-
-			$a->setAttribute( 'class', implode( ' ', array_unique( $classes ) ) );
-
-			$on_click = $block['attrs']['onclick'] ?? null;
-
-			if ( $on_click ) {
-				$a->setAttribute( 'onclick', JS::format_inline_js( $on_click ) );
-			}
-
-			$url = $block['attrs']['url'] ?? $a->getAttribute( 'href' );
-
-			if ( ! $url ) {
-				if ( ! $on_click ) {
-					$a->setAttribute( 'href', '#' );
-				} else {
-					$a->setAttribute( 'href', 'javascript:void(0)' );
-				}
-			}
-
-			$size = esc_attr( $block['attrs']['iconSize'] ?? null ) ?: '20';
-
-			if ( str_contains( $size, 'var' ) ) {
-				$svg_styles = CSS::string_to_array( $svg->getAttribute( 'style' ) );
-
-				unset ( $svg_styles['enable-background'] );
-
-				$svg_styles['height'] = CSS::format_custom_property( $size );
-				$svg_styles['width']  = CSS::format_custom_property( $size );
-
-				$imported->setAttribute( 'style', CSS::array_to_string( $svg_styles ) );
-
-			} else {
-				$imported->setAttribute( 'height', $size );
-				$imported->setAttribute( 'width', $size );
-			}
-
-			$fill = $imported->getAttribute( 'fill' );
-
-			if ( ! $fill ) {
-				$imported->setAttribute( 'fill', 'currentColor' );
-			}
-
-			$icon_position = $block['attrs']['iconPosition'] ?? 'end';
-
-			if ( $icon_position === 'start' ) {
-				$svg = $a->insertBefore( $imported, $a->firstChild );
-			} else {
-				$svg = $a->appendChild( $imported );
-			}
-
-			$title = $svg->insertBefore(
-				DOM::create_element( 'title', $dom ),
-				$svg->firstChild
-			);
-
-			$text = $dom->createTextNode( Str::title_case( $block['attrs']['iconName'] ?? '' ) );
-
-			$title->appendChild( $text );
-
-			$block_content = CSS::add_responsive_classes(
-				$dom->saveHTML(),
-				$block,
-				$this->responsive_settings
-			);
+			$block_content = $this->render_icon( $block_content, $block, $icon );
 		}
 
-		$url = esc_url( $block['attrs']['url'] ?? '' );
+		$url = esc_url( $attrs['url'] ?? '' );
 
 		if ( ! $url ) {
 			$dom = DOM::create( $block_content );
@@ -305,7 +205,7 @@ class Button implements Renderable {
 					$a->setAttribute( 'href', $href );
 				} else {
 
-					$on_click = $block['attrs']['onclick'] ?? null;
+					$on_click = $attrs['onclick'] ?? null;
 
 					if ( ! $on_click ) {
 						$a->setAttribute( 'href', '#' );
@@ -318,7 +218,7 @@ class Button implements Renderable {
 			$block_content = $dom->saveHTML();
 		}
 
-		$size = esc_attr( $block['attrs']['size'] ?? 'medium' );
+		$size = esc_attr( $attrs['size'] ?? 'medium' );
 
 		if ( in_array( $size, [ 'small', 'large' ] ) ) {
 			$dom = DOM::create( $block_content );
@@ -327,6 +227,7 @@ class Button implements Renderable {
 			if ( $div ) {
 				$div_classes   = explode( ' ', $div->getAttribute( 'class' ) );
 				$div_classes[] = "is-style-$size";
+
 				$div->setAttribute( 'class', implode( ' ', $div_classes ) );
 			}
 
@@ -378,5 +279,164 @@ class Button implements Renderable {
 		}
 
 		return $block_content;
+	}
+
+	/**
+	 * Renders button icon.
+	 *
+	 * @since 0.0.2
+	 *
+	 * @param string $block_content Block HTML.
+	 * @param array  $block         Block attributes.
+	 * @param string $icon          Icon SVG.
+	 *
+	 * @return string
+	 */
+	public function render_icon( string $block_content, array $block, string $icon ): string {
+		$dom   = DOM::create( $block_content );
+		$div   = DOM::get_element( 'div', $dom );
+		$attrs = $block['attrs'] ?? [];
+
+		if ( ! $div ) {
+			$div   = DOM::create_element( 'div', $dom );
+			$class = esc_attr( $attrs['className'] ?? '' );
+
+			$div->setAttribute( 'class', 'wp-block-button ' . $class );
+
+			$dom->appendChild( $div );
+		}
+
+		$div_styles = CSS::string_to_array( $div->getAttribute( 'style' ) );
+
+		foreach ( $div_styles as $key => $style ) {
+			if ( str_contains( $key, '--wp--custom--icon--' ) ) {
+				unset( $div_styles[ $key ] );
+			}
+		}
+
+		$div->setAttribute( 'style', CSS::array_to_string( $div_styles ) );
+
+		$a = DOM::get_element( 'a', $div );
+
+		if ( ! $a ) {
+			$a = DOM::create_element( 'a', $dom );
+
+			$a->setAttribute( 'class', 'wp-block-button__link wp-element-button' );
+
+			$div->appendChild( $a );
+		}
+
+		$svg_dom  = DOM::create( $icon );
+		$svg      = DOM::get_element( 'svg', $svg_dom );
+		$imported = DOM::node_to_element( $dom->importNode( $svg, true ) );
+		$gap      = $attrs['style']['spacing']['blockGap'] ?? null;
+		$classes  = explode( ' ', $a->getAttribute( 'class' ) );
+		$styles   = CSS::string_to_array( $a->getAttribute( 'style' ) );
+
+		if ( $gap ) {
+			$styles['gap'] = CSS::format_custom_property( $gap );
+		}
+
+		$padding = $attrs['style']['spacing']['padding'] ?? [];
+		$styles  = CSS::add_shorthand_property( $styles, 'padding', $padding );
+
+		$text_color = $attrs['textColor'] ?? null;
+
+		if ( $text_color ) {
+			$styles['color'] = CSS::format_custom_property( $text_color );
+		}
+
+		$background_color = $attrs['backgroundColor'] ?? null;
+
+		if ( $background_color ) {
+			$styles['background-color'] = CSS::format_custom_property( $background_color );
+			$classes[]                  = 'has-background';
+		}
+
+		$border_width = $attrs['style']['border']['width'] ?? null;
+		$border_style = $attrs['style']['border']['style'] ?? null;
+		$border_color = $attrs['style']['border']['color'] ?? null;
+
+		if ( $border_width ) {
+			$styles['border-width'] = CSS::format_custom_property( $border_width );
+		}
+
+		if ( $border_style ) {
+			$styles['border-style'] = CSS::format_custom_property( $border_style );
+		}
+
+		if ( $border_color ) {
+			$styles['border-color'] = CSS::format_custom_property( $border_color );
+		}
+
+		if ( $styles ) {
+			$a->setAttribute( 'style', CSS::array_to_string( $styles ) );
+		}
+
+		$a->setAttribute( 'class', implode( ' ', array_unique( $classes ) ) );
+
+		$on_click = $attrs['onclick'] ?? null;
+
+		if ( $on_click ) {
+			$a->setAttribute( 'onclick', JS::format_inline_js( $on_click ) );
+		}
+
+		$url = $attrs['url'] ?? $a->getAttribute( 'href' );
+
+		if ( ! $url ) {
+			if ( ! $on_click ) {
+				$a->setAttribute( 'href', '#' );
+			} else {
+				$a->setAttribute( 'href', 'javascript:void(0)' );
+			}
+		}
+
+		$size = esc_attr( $attrs['iconSize'] ?? null ) ?: '20';
+
+		if ( str_contains( $size, 'var' ) ) {
+			$svg_styles = CSS::string_to_array( $svg->getAttribute( 'style' ) );
+
+			unset ( $svg_styles['enable-background'] );
+
+			$svg_styles['height'] = CSS::format_custom_property( $size );
+			$svg_styles['width']  = CSS::format_custom_property( $size );
+
+			$imported->setAttribute( 'style', CSS::array_to_string( $svg_styles ) );
+
+		} else {
+			$imported->setAttribute( 'height', $size );
+			$imported->setAttribute( 'width', $size );
+		}
+
+		$fill = $imported->getAttribute( 'fill' );
+
+		if ( ! $fill ) {
+			$imported->setAttribute( 'fill', 'currentColor' );
+		}
+
+		$icon_position = $attrs['iconPosition'] ?? 'end';
+
+		if ( $icon_position === 'start' ) {
+			$svg = $a->insertBefore( $imported, $a->firstChild );
+		} else {
+			$svg = $a->appendChild( $imported );
+		}
+
+		$title = $svg->insertBefore(
+			DOM::create_element( 'title', $dom ),
+			$svg->firstChild
+		);
+
+		$text = $dom->createTextNode( Str::title_case( $attrs['iconName'] ?? '' ) );
+
+		if ( $text ) {
+			$title->appendChild( $text );
+		}
+
+		return CSS::add_responsive_classes(
+			$dom->saveHTML(),
+			$block,
+			$this->responsive_settings
+		);
 	}
 }

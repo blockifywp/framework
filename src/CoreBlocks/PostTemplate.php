@@ -31,8 +31,25 @@ class PostTemplate implements Renderable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$block_gap = $block['attrs']['style']['spacing']['blockGap'] ?? null;
-		$layout    = $block['attrs']['layout']['type'] ?? null;
+		$attrs     = $block['attrs'] ?? [];
+		$block_gap = $attrs['style']['spacing']['blockGap'] ?? null;
+		$layout    = $attrs['layout']['type'] ?? null;
+		$columns   = $attrs['layout']['columnCount'] ?? null;
+
+		if ( $columns ) {
+			$dom   = DOM::create( $block_content );
+			$first = DOM::get_element( '*', $dom );
+
+			if ( $first ) {
+				$first_styles = CSS::string_to_array( $first->getAttribute( 'style' ) );
+
+				$first_styles['--columns'] = $columns;
+
+				$first->setAttribute( 'style', CSS::array_to_string( $first_styles ) );
+
+				$block_content = $dom->saveHTML();
+			}
+		}
 
 		if ( ! is_null( $block_gap ) && $layout !== 'grid' ) {
 			$dom   = DOM::create( $block_content );

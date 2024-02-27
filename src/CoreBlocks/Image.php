@@ -56,11 +56,13 @@ class Image implements Renderable {
 			return $block_content;
 		}
 
-		$attrs    = $block['attrs'] ?? [];
-		$id       = $attrs['id'] ?? '';
-		$has_icon = ( $attrs['iconSet'] ?? '' ) && ( $attrs['iconName'] ?? '' ) || ( $attrs['iconSvgString'] ?? '' );
-		$style    = $attrs['style'] ?? [];
-		$has_svg  = $style['svgString'] ?? '';
+		$attrs         = $block['attrs'] ?? [];
+		$id            = $attrs['id'] ?? '';
+		$has_icon      = ( $attrs['iconSet'] ?? '' ) && ( $attrs['iconName'] ?? '' ) || ( $attrs['iconSvgString'] ?? '' );
+		$style         = $attrs['style'] ?? [];
+		$has_svg       = $style['svgString'] ?? '';
+		$margin        = $style['spacing']['margin'] ?? '';
+		$border_radius = $style['border']['radius'] ?? '';
 
 		// Image options.
 		if ( ! $has_icon && ! $has_svg ) {
@@ -75,27 +77,27 @@ class Image implements Renderable {
 			}
 		}
 
-		$margin = $style['spacing']['margin'] ?? '';
+		$dom    = DOM::create( $block_content );
+		$figure = DOM::get_element( 'figure', $dom );
 
-		if ( $margin ) {
-			$dom    = DOM::create( $block_content );
-			$figure = DOM::get_element( 'figure', $dom );
+		if ( $figure ) {
+			$styles = CSS::string_to_array( $figure->getAttribute( 'style' ) );
 
-			if ( $figure ) {
-				$styles = CSS::string_to_array( $figure->getAttribute( 'style' ) );
-
+			if ( $margin ) {
 				$styles = CSS::add_shorthand_property( $styles, 'margin', $style['spacing']['margin'] ?? [] );
-
-				$figure->setAttribute(
-					'style',
-					CSS::array_to_string( $styles )
-				);
 			}
 
-			$block_content = $dom->saveHTML();
+			if ( $border_radius ) {
+				$styles = CSS::add_shorthand_property( $styles, 'border-radius', $style['border']['radius'] ?? [] );
+			}
+
+			$figure->setAttribute(
+				'style',
+				CSS::array_to_string( $styles )
+			);
 		}
 
-		return $block_content;
+		return $dom->saveHTML();
 	}
 
 }

@@ -11,6 +11,8 @@ use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon as IconUtility;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
+use function array_unique;
+use function explode;
 use function in_array;
 use function is_array;
 use function str_contains;
@@ -93,7 +95,9 @@ class Icon implements Renderable {
 			$span_classes[] = 'has-gradient';
 		}
 
+		$class_names         = explode( ' ', $classes );
 		$figure_classes      = explode( ' ', $figure->getAttribute( 'class' ) );
+		$figure_classes      = array_merge( $figure_classes, $class_names );
 		$block_extras        = $this->responsive_settings;
 		$block_extra_classes = [];
 
@@ -128,6 +132,7 @@ class Icon implements Renderable {
 			}
 
 			$span_classes[] = $class;
+
 			unset( $figure_classes[ $index ] );
 		}
 
@@ -254,8 +259,21 @@ class Icon implements Renderable {
 			}
 		}
 
-		$figure->setAttribute( 'class', implode( ' ', $figure_classes ) );
-		$span->setAttribute( 'class', implode( ' ', $span_classes ) );
+		$filter = $attrs['style']['filter'] ?? [];
+
+		if ( ! empty( $filter ) && is_array( $filter ) ) {
+			$figure_classes[] = 'has-filter';
+			$filter_value     = '';
+
+			foreach ( $filter as $key => $value ) {
+				$filter_value .= "{$key}({$value}) ";
+			}
+
+			$figure_styles['filter'] = $filter_value;
+		}
+
+		$figure->setAttribute( 'class', implode( ' ', array_unique( $figure_classes ) ) );
+		$span->setAttribute( 'class', implode( ' ', array_unique( $span_classes ) ) );
 		$figure->setAttribute( 'style', CSS::array_to_string( $figure_styles ) );
 		$span->setAttribute( 'style', CSS::array_to_string( $span_styles ) );
 
