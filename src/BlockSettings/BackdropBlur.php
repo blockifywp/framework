@@ -43,6 +43,12 @@ class BackdropBlur implements Renderable {
 			return $block_content;
 		}
 
+		$name = $block['blockName'] ?? '';
+
+		if ( $name === 'core/navigation' ) {
+			return $block_content;
+		}
+
 		$dom   = DOM::create( $block_content );
 		$first = DOM::get_element( '*', $dom );
 

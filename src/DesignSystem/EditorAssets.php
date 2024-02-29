@@ -8,7 +8,10 @@ use Blockify\Framework\InlineAssets\Scripts;
 use Blockify\Framework\InlineAssets\Styles;
 use Blockify\Utilities\Debug;
 use function apply_filters;
+use function array_merge;
+use function esc_url;
 use function file_exists;
+use function get_admin_url;
 use function is_admin;
 use function time;
 use function wp_dequeue_style;
@@ -84,9 +87,16 @@ class EditorAssets {
 
 		wp_enqueue_script( $handle );
 
+		$default = [
+			'adminUrl' => esc_url( get_admin_url() ),
+		];
+
 		$data = apply_filters(
 			'blockify_editor_data',
-			$this->scripts->get_data( '', true )
+			array_merge(
+				$default,
+				$this->scripts->get_data( '', true )
+			)
 		);
 
 		wp_localize_script(

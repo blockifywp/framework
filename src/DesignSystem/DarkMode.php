@@ -134,19 +134,14 @@ class DarkMode implements Styleable {
 	 *
 	 * @return array
 	 */
-	public function add_dark_mode_body_class( array $classes ): array {
+	public function body_classes( array $classes ): array {
 		$cookie          = filter_input( INPUT_COOKIE, 'blockifyDarkMode', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$url_param       = filter_input( INPUT_GET, 'dark_mode', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$stylesheet_dir  = get_stylesheet_directory();
 		$global_settings = wp_get_global_settings();
 		$default_mode    = $this->get_default_mode( $global_settings );
 		$both_classes    = [ 'is-style-light', 'is-style-dark' ];
 
 		$classes[] = 'default-mode-' . $default_mode;
-
-		if ( ! $cookie ) {
-			$classes[] = 'is-style-' . $default_mode;
-		}
 
 		if ( $cookie === 'true' ) {
 			$classes[] = 'is-style-dark';
@@ -154,10 +149,10 @@ class DarkMode implements Styleable {
 			if ( $cookie === 'false' ) {
 				$classes[] = 'is-style-light';
 			} else {
-				if ( $cookie === 'auto' ) {
+				if ( $cookie === 'system' ) {
 					$classes = array_diff( $classes, $both_classes );
 
-					$classes[] = 'default-mode-auto';
+					$classes[] = 'default-mode-system';
 				}
 			}
 		}

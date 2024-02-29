@@ -60,7 +60,7 @@ class Navigation implements Renderable, Styleable {
 		$overlay_menu = $attrs['overlayMenu'] ?? true;
 		$filter       = $attrs['style']['filter'] ?? null;
 
-		if ( $overlay_menu && $filter ) {
+		if ( $overlay_menu && ! empty( $filter ) ) {
 			$filter_value = '';
 
 			foreach ( $filter as $property => $value ) {

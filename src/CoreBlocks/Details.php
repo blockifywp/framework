@@ -10,6 +10,7 @@ use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
+use function explode;
 
 /**
  * Details class.
@@ -39,8 +40,17 @@ class Details implements Renderable, Scriptable {
 			return $block_content;
 		}
 
-		$summary = DOM::get_element( 'summary', $details );
-		$padding = $block['attrs']['style']['spacing']['padding'] ?? [];
+		$summary     = DOM::get_element( 'summary', $details );
+		$attrs       = $block['attrs'] ?? [];
+		$padding     = $attrs['style']['spacing']['padding'] ?? [];
+		$expand_icon = $attrs['expandIcon'] ?? '';
+		$classes     = explode( ' ', $details->getAttribute( 'class' ) );
+
+		if ( $expand_icon === 'plus' ) {
+			$classes[] = 'is-style-plus';
+		}
+
+		$details->setAttribute( 'class', implode( ' ', $classes ) );
 
 		if ( $summary && $padding ) {
 			$summary_styles = CSS::string_to_array( $summary->getAttribute( 'style' ) );
