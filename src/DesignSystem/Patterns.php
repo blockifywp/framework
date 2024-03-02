@@ -4,7 +4,10 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\DesignSystem;
 
+use Blockify\Utilities\Debug;
+use Blockify\Utilities\Interfaces\Renderable;
 use Blockify\Utilities\Pattern;
+use WP_Block;
 use WP_Block_Patterns_Registry;
 use function apply_filters;
 use function basename;
@@ -26,7 +29,7 @@ use function ucwords;
  *
  * @since 0.0.2
  */
-class Patterns {
+class Patterns implements Renderable {
 
 	/**
 	 * Removes core block patterns.
@@ -119,6 +122,32 @@ class Patterns {
 				Pattern::register_from_file( $file );
 			}
 		}
+	}
+
+	/**
+	 * Renders the block.
+	 *
+	 * @param string   $block_content Block content.
+	 * @param array    $block         Block attributes.
+	 * @param WP_Block $instance      Block instance.
+	 *
+	 * @hook render_block_core/pattern
+	 * @hook render_block_blockify/pattern
+	 *
+	 * @return string
+	 */
+	public function render( string $block_content, array $block, WP_Block $instance ): string {
+		$slug = $block['attrs']['slug'] ?? '';
+
+		if ( ! Debug::is_enabled() || ! $slug ) {
+			return $block_content;
+		}
+
+		return <<<HTML
+<!-- $slug -->
+	$block_content
+<!-- /$slug -->
+HTML;
 	}
 
 	/**
