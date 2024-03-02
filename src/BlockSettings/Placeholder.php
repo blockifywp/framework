@@ -13,6 +13,7 @@ use Blockify\Utilities\Interfaces\Renderable;
 use Blockify\Utilities\Str;
 use WP_Block;
 use function array_merge;
+use function block_is_rendering_preview;
 use function esc_attr;
 use function esc_url;
 use function explode;
@@ -42,7 +43,7 @@ class Placeholder implements Renderable, Styleable {
 		$styles->add_file(
 			'block-extensions/placeholder-image.css',
 			[ 'is-placeholder' ],
-			is_archive()
+			is_archive() || block_is_rendering_preview()
 		);
 	}
 
