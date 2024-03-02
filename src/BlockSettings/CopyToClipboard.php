@@ -6,8 +6,6 @@ namespace Blockify\Framework\BlockSettings;
 
 use Blockify\Framework\InlineAssets\Scriptable;
 use Blockify\Framework\InlineAssets\Scripts;
-use Blockify\Framework\InlineAssets\Styleable;
-use Blockify\Framework\InlineAssets\Styles;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
@@ -24,7 +22,7 @@ use function wp_strip_all_tags;
  *
  * @since 1.0.0
  */
-class CopyToClipboard implements Renderable, Scriptable, Styleable {
+class CopyToClipboard implements Renderable, Scriptable {
 
 	/**
 	 * Renders the code block.
@@ -101,19 +99,6 @@ SVG;
 	 */
 	public function scripts( Scripts $scripts ): void {
 		$scripts->add_file( 'copy-to-clipboard.js', [ 'copy-to-clipboard' ] );
-	}
-
-	/**
-	 * Add click to copy CSS.
-	 *
-	 * @since 0.9.34
-	 *
-	 * @param Styles $styles Styles instance.
-	 *
-	 * @return void
-	 */
-	public function styles( Styles $styles ): void {
-		$styles->add_file( 'block-extensions/copy-to-clipboard.css', [ 'copy-to-clipboard' ] );
 	}
 
 }

@@ -6,6 +6,7 @@ namespace Blockify\Framework\DesignSystem;
 
 use Blockify\Framework\InlineAssets\Styleable;
 use Blockify\Framework\InlineAssets\Styles;
+use Blockify\Utilities\Debug;
 use function function_exists;
 
 /**
@@ -120,14 +121,15 @@ class BaseCss implements Styleable {
 
 		// Placeholder handled by service.
 		$styles['block-extensions'] = [
-			'animation'     => [ 'has-animation', 'will-animate' ],
-			'aspect-ratio'  => [ 'has-aspect-ratio-' ],
-			'box-shadow'    => [ 'has-box-shadow' ],
-			'gradient-mask' => [ '-gradient-background' ],
-			'inline-image'  => [ 'wp-image-' ],
-			'on-click'      => [ 'onclick="' ],
-			'shadow'        => [ 'has-shadow', 'has-box-shadow', 'has-text-shadow' ],
-			'transform'     => [ 'has-transform' ],
+			'animation'         => [ 'has-animation', 'will-animate', 'has-scroll-animation' ],
+			'aspect-ratio'      => [ 'has-aspect-ratio-' ],
+			'box-shadow'        => [ 'has-box-shadow' ],
+			'copy-to-clipboard' => [ 'copy-to-clipboard' ],
+			'gradient-mask'     => [ '-gradient-background' ],
+			'inline-image'      => [ 'wp-image-' ],
+			'on-click'          => [ 'onclick="' ],
+			'shadow'            => [ 'has-shadow', 'has-box-shadow', 'has-text-shadow' ],
+			'transform'         => [ 'has-transform' ],
 		];
 
 		// Admin bar handled by service.
@@ -145,11 +147,11 @@ class BaseCss implements Styleable {
 			'splide'             => [ 'splide' ],
 		];
 
-		if ( function_exists( 'xdebug_is_debugger_active' ) ) {
+		if ( Debug::is_enabled() && function_exists( 'xdebug_is_debugger_active' ) ) {
 			$styles['components']['xdebug'] = [];
 		}
 
-		if ( function_exists( 'd' ) && function_exists( 's' ) ) {
+		if ( Debug::is_enabled() && function_exists( 'd' ) && function_exists( 's' ) ) {
 			$styles['components']['kint'] = [];
 		}
 

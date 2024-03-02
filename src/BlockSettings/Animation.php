@@ -137,7 +137,6 @@ class Animation implements Renderable, Styleable, Scriptable {
 	 */
 	public function styles( Styles $styles ): void {
 		$styles->add_callback( [ $this, 'get_animation_styles' ] );
-		$styles->add_file( 'block-extensions/animation.css', [ 'has-animation', 'has-scroll-animation' ] );
 	}
 
 	/**
