@@ -43,7 +43,6 @@ class ServiceProvider implements Registerable {
 		BlockSettings\SubHeading::class,
 		BlockSettings\TemplateTags::class,
 		BlockSettings\TextShadow::class,
-		BlockSettings\Visibility::class,
 		BlockVariations\AccordionList::class,
 		BlockVariations\Counter::class,
 		BlockVariations\CurvedText::class,
