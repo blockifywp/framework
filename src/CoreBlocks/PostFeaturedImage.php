@@ -9,6 +9,7 @@ use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
+use function array_unique;
 use function esc_attr;
 use function explode;
 use function implode;
@@ -81,8 +82,6 @@ class PostFeaturedImage implements Renderable {
 			$figure_classes[] = "has-{$hover_preset}-shadow-hover";
 		}
 
-		$figure->setAttribute( 'class', implode( ' ', $figure_classes ) );
-
 		$figure_styles = CSS::string_to_array( $figure->getAttribute( 'style' ) );
 
 		if ( $use_custom && $shadow_custom ) {
@@ -112,6 +111,7 @@ class PostFeaturedImage implements Renderable {
 		$img_classes = $img ? explode( ' ', $img->getAttribute( 'class' ) ) : [];
 
 		$transform       = $attrs['style']['transform'] ?? [];
+		$transform_hover = $attrs['style']['transformHover'] ?? [];
 		$transform_units = [
 			'rotate'    => 'deg',
 			'skew'      => 'deg',
@@ -129,10 +129,26 @@ class PostFeaturedImage implements Renderable {
 
 			if ( ! in_array( 'has-transform', $img_classes, true ) ) {
 				$figure_styles['transform'] = $transform_value;
+				$figure_classes[]           = 'has-transform';
 			}
 		}
 
-		$filter = $attrs['style']['filter'] ?? [];
+		if ( ! empty( $transform_hover ) && is_array( $transform_hover ) ) {
+			$transform_value = '';
+
+			foreach ( $transform_hover as $key => $value ) {
+				$unit            = $transform_units[ $key ] ?? '';
+				$transform_value .= "{$key}({$value}{$unit}) ";
+			}
+
+			if ( ! in_array( 'has-transform', $img_classes, true ) ) {
+				$figure_styles['--transform-hover'] = $transform_value;
+				$figure_classes[]                   = 'has-transform';
+			}
+		}
+
+		$filter       = $attrs['style']['filter'] ?? [];
+		$filter_hover = $attrs['style']['filterHover'] ?? [];
 
 		if ( ! empty( $filter ) && is_array( $filter ) ) {
 			$filter_options = $this->filter_options;
@@ -145,8 +161,26 @@ class PostFeaturedImage implements Renderable {
 
 			if ( ! in_array( 'has-filter', $img_classes, true ) ) {
 				$figure_styles['filter'] = $filter_value;
+				$figure_classes[]        = 'has-filter';
 			}
 		}
+
+		if ( ! empty( $filter_hover ) && is_array( $filter_hover ) ) {
+			$filter_options = $this->filter_options;
+			$filter_value   = '';
+
+			foreach ( $filter_hover as $key => $value ) {
+				$unit         = $filter_options[ $key ]['unit'] ?? '';
+				$filter_value .= "{$key}({$value}{$unit}) ";
+			}
+
+			if ( ! in_array( 'has-filter', $img_classes, true ) ) {
+				$figure_styles['--filter-hover'] = $filter_value;
+				$figure_classes[]                = 'has-filter';
+			}
+		}
+
+		$figure->setAttribute( 'class', implode( ' ', array_unique( $figure_classes ) ) );
 
 		if ( $figure_styles ) {
 			$figure->setAttribute( 'style', CSS::array_to_string( $figure_styles ) );
