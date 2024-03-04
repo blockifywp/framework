@@ -23,6 +23,7 @@ use function is_string;
 use function ltrim;
 use function round;
 use function sprintf;
+use function str_contains;
 use function substr;
 use function wp_get_global_settings;
 use const FILTER_SANITIZE_FULL_SPECIAL_CHARS;
@@ -223,12 +224,18 @@ class DarkMode implements Styleable {
 		foreach ( $gradients as $slug => $value ) {
 			$default_styles["--wp--preset--gradient--{$slug}"] = $value;
 
+			$camel_case     = Str::kebab_to_camel( $slug );
 			$opposite_value = $opposite_settings['gradients'][ $slug ] ?? $value;
+			$opposite_value = $opposite_settings['gradients'][ $camel_case ] ?? $opposite_value;
 
 			$opposite_styles["--wp--preset--gradient--{$slug}"] = $opposite_value;
 		}
 
 		foreach ( $custom as $name => $value ) {
+			if ( str_contains( $name, 'dark-mode--gradients' ) ) {
+				continue;
+			}
+
 			if ( is_string( $value ) && Str::contains_any( $value, '--wp--preset--color--', '--wp--preset--gradient--' ) ) {
 				$default_styles[ $name ]  = $value;
 				$opposite_styles[ $name ] = $value;
