@@ -16,6 +16,7 @@ use function is_admin;
 use function time;
 use function wp_dequeue_style;
 use function wp_enqueue_style;
+use function wp_get_global_settings;
 use function wp_localize_script;
 use function wp_register_script;
 use function wp_register_style;
@@ -87,8 +88,11 @@ class EditorAssets {
 
 		wp_enqueue_script( $handle );
 
+		$global_settings = wp_get_global_settings();
+
 		$default = [
-			'adminUrl' => esc_url( get_admin_url() ),
+			'adminUrl'         => esc_url( get_admin_url() ),
+			'defaultGradients' => $global_settings['color']['gradients']['default'] ?? [],
 		];
 
 		$data = apply_filters(
