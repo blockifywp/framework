@@ -8,7 +8,9 @@ use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
+use function array_unique;
 use function count;
+use function explode;
 
 /**
  * Columns class.
@@ -31,41 +33,36 @@ class Columns implements Renderable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$attrs  = $block['attrs'] ?? [];
+		$attrs = $block['attrs'] ?? [];
+		$dom   = DOM::create( $block_content );
+		$div   = DOM::get_element( 'div', $dom );
+
+		if ( ! $div ) {
+			return $block_content;
+		}
+
+		$classes = explode( ' ', $div->getAttribute( 'class' ) );
+		$styles  = CSS::string_to_array( $div->getAttribute( 'style' ) );
+
 		$margin = $attrs['style']['spacing']['margin'] ?? null;
 
 		if ( $margin ) {
-			$dom   = DOM::create( $block_content );
-			$first = DOM::get_element( 'div', $dom );
-
-			if ( $first ) {
-				$styles = CSS::string_to_array( $first->getAttribute( 'style' ) );
-				$styles = CSS::add_shorthand_property( $styles, 'margin', $margin );
-
-				$first->setAttribute( 'style', CSS::array_to_string( $styles ) );
-			}
-
-			$block_content = $dom->saveHTML();
+			$styles = CSS::add_shorthand_property( $styles, 'margin', $margin );
 		}
 
-		$dom = DOM::create( $block_content );
-		$div = DOM::get_element( 'div', $dom );
+		$stacked   = $attrs['isStackedOnMobile'] ?? true;
+		$classes[] = $stacked ? 'is-stacked-on-mobile' : 'is-not-stacked-on-mobile';
 
-		if ( $div ) {
-			$column_count = (string) count( $block['innerBlocks'] ?? 0 );
+		$column_count = (string) count( $block['innerBlocks'] ?? 0 );
 
-			$div->setAttribute( 'data-columns', $column_count );
+		$div->setAttribute( 'data-columns', $column_count );
 
-			$styles = CSS::string_to_array( $div->getAttribute( 'style' ) );
+		$styles['--columns'] = $column_count;
 
-			$styles['--columns'] = $column_count;
+		$div->setAttribute( 'style', CSS::array_to_string( $styles ) );
+		$div->setAttribute( 'class', implode( ' ', array_unique( $classes ) ) );
 
-			$div->setAttribute( 'style', CSS::array_to_string( $styles ) );
-
-			$block_content = $dom->saveHTML();
-		}
-
-		return $block_content;
+		return $dom->saveHTML();
 	}
 
 }

@@ -143,9 +143,6 @@ class ServiceProvider implements Registerable {
 		$scripts = $container->make( Scripts::class, $this->file );
 		$styles  = $container->make( Styles::class, $this->file );
 
-		Hook::annotations( $scripts );
-		Hook::annotations( $styles );
-
 		foreach ( $this->services as $id ) {
 			$service = $container->make( $id );
 
@@ -161,5 +158,8 @@ class ServiceProvider implements Registerable {
 				$service->styles( $styles );
 			}
 		}
+		
+		Hook::annotations( $scripts );
+		Hook::annotations( $styles );
 	}
 }

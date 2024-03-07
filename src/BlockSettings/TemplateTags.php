@@ -16,11 +16,13 @@ use function get_post_field;
 use function get_post_meta;
 use function get_post_type;
 use function get_post_type_object;
+use function get_queried_object;
 use function get_the_ID;
 use function get_the_title;
 use function gmdate;
 use function home_url;
 use function in_array;
+use function is_a;
 use function is_archive;
 use function is_callable;
 use function is_home;
@@ -220,6 +222,21 @@ class TemplateTags implements Renderable {
 				remove_filter( 'get_the_archive_title_prefix', '__return_empty_string' );
 
 				return $title;
+			};
+
+			$tags['archive_name'] = static function (): string {
+				$queried_object = get_queried_object();
+				$name           = '';
+
+				if ( is_a( $queried_object, 'WP_Term' ) ) {
+					$name = $queried_object->name;
+				}
+
+				if ( is_home() ) {
+					$name = get_post_field( 'post_name', get_option( 'page_for_posts', true ) );
+				}
+
+				return $name;
 			};
 		}
 

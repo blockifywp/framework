@@ -8,6 +8,7 @@ use Blockify\Framework\InlineAssets\Styles;
 use function array_flip;
 use function file_get_contents;
 use function is_a;
+use function preg_replace;
 use function str_replace;
 use function str_starts_with;
 use function trim;
@@ -77,10 +78,12 @@ class BlockCss {
 				continue;
 			}
 
-			wp_add_inline_style(
-				$handle,
-				trim( file_get_contents( $file ) )
-			);
+			$css = trim( file_get_contents( $file ) );
+
+			// Remove zero width spaces and other invisible characters.
+			$css = preg_replace( '/^[\pZ\pC]+|[\pZ\pC]+$/u', '', $css );
+
+			wp_add_inline_style( $handle, $css );
 		}
 	}
 }

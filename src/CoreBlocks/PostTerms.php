@@ -61,7 +61,7 @@ class PostTerms implements Renderable {
 					...( explode( ' ', $div->getAttribute( 'class' ) ) ),
 				] );
 
-				$div->setAttribute( 'class', implode( ' ', $classes ) );
+				$div->setAttribute( 'class', trim( implode( ' ', $classes ) ) );
 			}
 
 			$block_content = $dom->saveHTML();
@@ -206,7 +206,7 @@ class PostTerms implements Renderable {
 			$padding = $attrs['style']['spacing']['padding'] ?? null;
 			$styles  = CSS::add_shorthand_property( $styles, 'padding', $padding );
 
-			$div->setAttribute( 'class', implode( ' ', $div_classes ) );
+			$div->setAttribute( 'class', trim( implode( ' ', array_unique( $div_classes ) ) ) );
 
 			if ( $styles ) {
 				$div->setAttribute( 'style', CSS::array_to_string( $styles ) );

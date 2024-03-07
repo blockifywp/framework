@@ -227,5 +227,4 @@ class Animation implements Renderable, Styleable, Scriptable {
 
 		return $animations;
 	}
-
 }

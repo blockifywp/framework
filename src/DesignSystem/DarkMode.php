@@ -139,8 +139,14 @@ class DarkMode implements Styleable {
 		$cookie          = filter_input( INPUT_COOKIE, 'blockifyDarkMode', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$url_param       = filter_input( INPUT_GET, 'dark_mode', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$global_settings = wp_get_global_settings();
-		$default_mode    = $this->get_default_mode( $global_settings );
-		$both_classes    = [ 'is-style-light', 'is-style-dark' ];
+		$dark_settings   = $settings['custom']['darkMode'] ?? null;
+
+		if ( $dark_settings === false ) {
+			return $classes;
+		}
+
+		$default_mode = $this->get_default_mode( $global_settings );
+		$both_classes = [ 'is-style-light', 'is-style-dark' ];
 
 		$classes[] = 'default-mode-' . $default_mode;
 
@@ -177,7 +183,14 @@ class DarkMode implements Styleable {
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
-		$settings          = wp_get_global_settings();
+		$settings       = wp_get_global_settings();
+		$light_settings = $settings['custom']['lightMode'] ?? null;
+		$dark_settings  = $settings['custom']['darkMode'] ?? null;
+
+		if ( $dark_settings === false ) {
+			return;
+		}
+
 		$palette           = $settings['color']['palette']['theme'] ?? [];
 		$custom            = array_replace(
 			JSON::compute_theme_vars( $settings['custom'] ?? [] ),
@@ -186,8 +199,6 @@ class DarkMode implements Styleable {
 		$colors            = Color::get_color_values( $palette );
 		$gradients         = Color::get_color_values( $settings['color']['gradients']['theme'] ?? [], 'gradient' );
 		$system            = Color::get_system_colors();
-		$light_settings    = $settings['custom']['lightMode'] ?? null;
-		$dark_settings     = $settings['custom']['darkMode'] ?? null;
 		$opposite_settings = $light_settings ?? $dark_settings ?? null;
 		$default_mode      = $this->get_default_mode( $settings );
 		$opposite_mode     = $default_mode === 'light' ? 'dark' : 'light';
