@@ -12,6 +12,7 @@ use function array_merge;
 use function esc_url;
 use function file_exists;
 use function get_admin_url;
+use function get_home_url;
 use function is_admin;
 use function time;
 use function wp_dequeue_style;
@@ -91,6 +92,7 @@ class EditorAssets {
 		$global_settings = wp_get_global_settings();
 
 		$default = [
+			'siteUrl'          => esc_url( get_home_url() ),
 			'adminUrl'         => esc_url( get_admin_url() ),
 			'defaultGradients' => $global_settings['color']['gradients']['default'] ?? [],
 		];

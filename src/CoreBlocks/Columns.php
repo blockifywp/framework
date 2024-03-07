@@ -8,12 +8,7 @@ use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
-use function array_unique;
 use function count;
-use function explode;
-use function implode;
-use function in_array;
-use function str_replace;
 
 /**
  * Columns class.
@@ -36,34 +31,8 @@ class Columns implements Renderable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$class      = 'is-stacked-on-mobile';
-		$is_stacked = $block['attrs']['stackedOnMobile'] ?? null;
-
-		if ( $is_stacked && $block['attrs']['isStackedOnMobile'] === false ) {
-			$class = 'is-not-stacked-on-mobile';
-		}
-
-		if ( $class === 'is-stacked-on-mobile' ) {
-			$block_content = str_replace( 'wp-block-columns ', 'wp-block-columns is-stacked-on-mobile ', $block_content );
-			$dom           = DOM::create( $block_content );
-			$div           = DOM::get_element( 'div', $dom );
-
-			if ( $div ) {
-				$div_classes = explode( ' ', $div->getAttribute( 'class' ) );
-
-				if ( ! in_array( $class, $div_classes ) ) {
-					$div_classes[] = $class;
-				}
-
-				$div_classes = array_unique( $div_classes );
-
-				$div->setAttribute( 'class', implode( ' ', $div_classes ) );
-			}
-
-			$block_content = $dom->saveHTML();
-		}
-
-		$margin = $block['attrs']['style']['spacing']['margin'] ?? null;
+		$attrs  = $block['attrs'] ?? [];
+		$margin = $attrs['style']['spacing']['margin'] ?? null;
 
 		if ( $margin ) {
 			$dom   = DOM::create( $block_content );
@@ -86,6 +55,12 @@ class Columns implements Renderable {
 			$column_count = (string) count( $block['innerBlocks'] ?? 0 );
 
 			$div->setAttribute( 'data-columns', $column_count );
+
+			$styles = CSS::string_to_array( $div->getAttribute( 'style' ) );
+
+			$styles['--columns'] = $column_count;
+
+			$div->setAttribute( 'style', CSS::array_to_string( $styles ) );
 
 			$block_content = $dom->saveHTML();
 		}
