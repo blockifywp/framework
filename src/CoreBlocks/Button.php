@@ -387,6 +387,8 @@ class Button implements Renderable {
 			if ( ! $on_click ) {
 				$a->setAttribute( 'href', '#' );
 			} else {
+				$a = DOM::change_tag_name( 'button', $a );
+
 				$a->setAttribute( 'href', 'javascript:void(0)' );
 			}
 		}
