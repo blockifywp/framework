@@ -154,6 +154,10 @@ class CustomProperties implements Styleable {
 			]
 		);
 
+		// Fix for white and black colors.
+		$styles['--wp--preset--color--white'] = 'var(--wp--preset--color--neutral-0,#ffffff)';
+		$styles['--wp--preset--color--black'] = 'var(--wp--preset--color--neutral-950,#000000)';
+
 		/**
 		 * Filters the dynamic custom properties.
 		 *

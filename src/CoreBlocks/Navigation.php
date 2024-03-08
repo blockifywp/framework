@@ -11,6 +11,7 @@ use Blockify\Utilities\DOM;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_keys;
+use function array_search;
 use function explode;
 use function implode;
 use function in_array;
@@ -75,18 +76,30 @@ class Navigation implements Renderable, Styleable {
 
 			$styles['--wp--custom--nav--filter'] = trim( $filter_value );
 
-			// Overlay background color.
-			$background_color = $attrs['overlayBackgroundColor'] ?? $attrs['customOverlayBackgroundColor'] ?? '';
+			$overlay_background_color = $attrs['overlayBackgroundColor'] ?? $attrs['customOverlayBackgroundColor'] ?? '';
 
 			$global_settings = wp_get_global_settings();
-			$color_slugs     = wp_list_pluck( $global_settings['color']['palette']['theme'] ?? [], 'slug' );
+			$color_slugs     = wp_list_pluck(
+				$global_settings['color']['palette']['theme'] ?? [], 'slug'
+			);
+			$color_values    = wp_list_pluck(
+				$global_settings['color']['palette']['theme'] ?? [], 'color'
+			);
 
-			if ( in_array( $background_color, $color_slugs, true ) ) {
-				$background_color = "var(--wp--preset--color--{$background_color})";
+			if ( $overlay_background_color === 'white' && in_array( '#ffffff', $color_values, true ) ) {
+				$index = array_search( '#ffffff', $color_values, true );
+
+				if ( $index ) {
+					$overlay_background_color = $color_slugs[ $index ] ?? '';
+				}
 			}
 
-			if ( $background_color ) {
-				$styles['--wp--custom--nav--background-color'] = CSS::format_custom_property( $background_color );
+			if ( in_array( $overlay_background_color, $color_slugs, true ) ) {
+				$overlay_background_color = "var(--wp--preset--color--{$overlay_background_color})";
+			}
+
+			if ( $overlay_background_color ) {
+				$styles['--wp--custom--nav--background-color'] = CSS::format_custom_property( $overlay_background_color );
 			}
 
 			$nav->setAttribute( 'style', CSS::array_to_string( $styles ) );
