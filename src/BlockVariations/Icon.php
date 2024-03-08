@@ -11,12 +11,15 @@ use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon as IconUtility;
 use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
+use function array_diff;
 use function array_unique;
 use function explode;
 use function in_array;
 use function is_array;
 use function str_contains;
 use function str_replace;
+use function wp_get_global_settings;
+use function wp_list_pluck;
 
 /**
  * Icon class.
@@ -136,10 +139,15 @@ class Icon implements Renderable {
 			unset( $figure_classes[ $index ] );
 		}
 
-		$text_color = $attrs['textColor'] ?? null;
+		$global_settings = wp_get_global_settings();
+		$color_slugs     = wp_list_pluck( $global_settings['color']['palette']['theme'] ?? [], 'slug' );
+		$has_primary     = false;
 
-		if ( $text_color ) {
-			$figure_classes[] = "has-{$text_color}-color";
+		foreach ( $color_slugs as $slug ) {
+			if ( str_contains( $slug, 'primary-' ) ) {
+				$has_primary = true;
+				break;
+			}
 		}
 
 		$aria_label = $img->getAttribute( 'alt' ) ? $img->getAttribute( 'alt' ) : str_replace( '-', ' ', $name ) . __( ' icon', 'blockify' );
@@ -193,6 +201,18 @@ class Icon implements Renderable {
 			unset( $span_styles['--wp--custom--icon--size'] );
 		}
 
+		$text_color = $attrs['textColor'] ?? null;
+
+		if ( $text_color ) {
+			if ( ! $has_primary && str_contains( $text_color, 'primary-' ) ) {
+				$text_color = str_replace( 'primary-', 'neutral-', $text_color );
+			}
+
+			$span_styles['--wp--custom--icon--color'] = "var(--wp--preset--color--{$text_color})";
+
+			$span_classes = array_diff( $span_classes, [ "has-{$text_color}-color" ] );
+		}
+
 		$custom_text_color = $attrs['style']['color']['text'] ?? null;
 
 		if ( $custom_text_color ) {
@@ -202,18 +222,47 @@ class Icon implements Renderable {
 		$background_color = $attrs['backgroundColor'] ?? null;
 
 		if ( $background_color ) {
-			$figure_styles['--wp--custom--icon--background'] = "var(--wp--preset--color--{$background_color})";
+			if ( ! $has_primary && str_contains( $background_color, 'primary-' ) ) {
+				$background_color = str_replace( 'primary-', 'neutral-', $background_color );
+			}
+
+			unset( $figure_styles['background-color'] );
+			unset( $span_styles['background-color'] );
+			unset( $figure_styles['--wp--custom--icon--background'] );
+
+			$span_styles['--wp--custom--icon--background'] = "var(--wp--preset--color--$background_color)";
 		}
 
 		if ( $gradient ) {
 			if ( $text_color || $custom_text_color ) {
-				$figure_styles['--wp--custom--icon--background'] = "var(--wp--preset--gradient--{$gradient})";
+				$figure_styles['--wp--custom--icon--background'] = "var(--wp--preset--gradient--$gradient)";
 			} else {
-				$figure_styles['--wp--custom--icon--color'] = "var(--wp--preset--gradient--{$gradient})";
+				$figure_styles['--wp--custom--icon--color'] = "var(--wp--preset--gradient--$gradient)";
 			}
 		}
 
-		$border_radius = $attrs['style']['border']['radius'] ?? null;
+		$border              = $attrs['style']['border'] ?? null;
+		$border_width        = $border['width'] ?? null;
+		$border_color        = $attrs['borderColor'] ?? null;
+		$border_custom_color = $border['color'] ?? null;
+		$border_style        = $border['style'] ?? null;
+		$border_radius       = $border['radius'] ?? null;
+
+		if ( $border_width ) {
+			$span_styles['border-width'] = $border_width;
+		}
+
+		if ( $border_color ) {
+			$span_styles['border-color'] = "var(--wp--preset--color--$border_color)";
+		}
+
+		if ( $border_custom_color ) {
+			$span_styles['border-color'] = $border_custom_color;
+		}
+
+		if ( $border_style ) {
+			$span_styles['border-style'] = $border_style;
+		}
 
 		if ( $border_radius ) {
 			$span_styles['border-radius'] = $border_radius;
