@@ -17,6 +17,7 @@ use function get_post_meta;
 use function get_post_type;
 use function get_post_type_object;
 use function get_queried_object;
+use function get_the_archive_title;
 use function get_the_ID;
 use function get_the_title;
 use function gmdate;
@@ -26,11 +27,14 @@ use function is_a;
 use function is_archive;
 use function is_callable;
 use function is_home;
+use function is_month;
 use function is_null;
+use function is_year;
 use function preg_match_all;
 use function shortcode_exists;
 use function str_contains;
 use function str_replace;
+use function strip_tags;
 use function strtolower;
 
 /**
@@ -234,6 +238,14 @@ class TemplateTags implements Renderable {
 
 				if ( is_home() ) {
 					$name = get_post_field( 'post_name', get_option( 'page_for_posts', true ) );
+				}
+
+				if ( is_month() ) {
+					$name = strip_tags( get_the_date( 'F Y' ) );
+				}
+
+				if ( is_year() ) {
+					$name = strip_tags( get_the_date( 'Y' ) );
 				}
 
 				return $name;
