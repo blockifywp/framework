@@ -11,6 +11,7 @@ use WP_Block;
 use function array_unshift;
 use function esc_attr;
 use function explode;
+use function str_replace;
 
 /**
  * List class.
@@ -33,6 +34,18 @@ class ListBlock implements Renderable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
+
+		// Correct URLs for template tags.
+		$block_content = str_replace(
+			[
+				'http://https://',
+			],
+			[
+				'https://',
+			],
+			$block_content
+		);
+
 		$dom = DOM::create( $block_content );
 		$ul  = DOM::get_element( 'ul', $dom );
 		$ol  = DOM::get_element( 'ol', $dom );
