@@ -5,11 +5,13 @@ declare( strict_types=1 );
 namespace Blockify\Framework\BlockSettings;
 
 use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Utilities\Str;
 use WP_Block;
 use WP_Block_Type_Registry;
 use function add_filter;
 use function apply_filters;
 use function array_keys;
+use function array_merge;
 use function esc_html;
 use function get_bloginfo;
 use function get_post_field;
@@ -17,6 +19,7 @@ use function get_post_meta;
 use function get_post_type;
 use function get_post_type_object;
 use function get_queried_object;
+use function get_stylesheet;
 use function get_the_archive_title;
 use function get_the_ID;
 use function get_the_title;
@@ -68,9 +71,13 @@ class TemplateTags implements Renderable {
 			return $block_content;
 		}
 
-		$category = $registered_blocks[ $block_name ]->category ?? '';
-
-		$other_blocks = [ 'core/button', 'core/navigation-link', 'core/image' ];
+		$category     = $registered_blocks[ $block_name ]->category ?? '';
+		$other_blocks = [
+			'core/button',
+			'core/image',
+			'core/navigation-link',
+			'core/post-excerpt',
+		];
 
 		if ( 'text' !== $category && ! in_array( $block_name, $other_blocks, true ) ) {
 			return $block_content;
@@ -136,42 +143,22 @@ class TemplateTags implements Renderable {
 	}
 
 	/**
-	 * Get template tags.
+	 * Get the archive title for the home page.
 	 *
-	 * @since 0.9.34
+	 * @since 1.3.0
 	 *
-	 * @param ?int $post_id Extra tags.
+	 * @param string $title Archive title.
 	 *
-	 * @return array
+	 * @hook  get_the_archive_title
+	 *
+	 * @return string
 	 */
-	public function get_template_tags( ?int $post_id ): array {
-		static $tags = null;
-
-		if ( is_null( $tags ) ) {
-			$year      = gmdate( 'Y' );
-			$site_name = get_bloginfo( 'name', 'display' );
-
-			$tags = [
-				'year'         => $year,
-				'current_year' => $year, // Backwards compatibility.
-				'date'         => gmdate( 'm/d/Y' ),
-				'home_url'     => home_url(),
-				'site_title'   => $site_name,
-				'site_name'    => $site_name,
-			];
+	public function get_the_archive_title_home( string $title ): string {
+		if ( is_home() ) {
+			$title = get_the_title( get_option( 'page_for_posts', true ) );
 		}
 
-		/**
-		 * Filter template tags.
-		 *
-		 * @since 0.9.34
-		 *
-		 * @param array $tags    Template tags.
-		 * @param int   $post_id Post ID.
-		 *
-		 * @return array
-		 */
-		return apply_filters( 'blockify_template_tags', $tags, $post_id );
+		return $title;
 	}
 
 	/**
@@ -186,7 +173,9 @@ class TemplateTags implements Renderable {
 	 *
 	 * @return array
 	 */
-	public function add_post_template_tags( array $tags, ?int $post_id ): array {
+	private function get_post_template_tags( ?int $post_id ): array {
+		$tags = [];
+
 		if ( ! $post_id ) {
 			return $tags;
 		}
@@ -209,14 +198,11 @@ class TemplateTags implements Renderable {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param array $tags    Template tags.
-	 * @param ?int  $post_id Post ID.
-	 *
-	 * @hook  blockify_template_tags
-	 *
 	 * @return array
 	 */
-	public function add_archive_template_tags( array $tags, ?int $post_id ): array {
+	private function get_archive_template_tags(): array {
+		$tags = [];
+
 		if ( is_archive() || is_home() ) {
 			$tags['archive_title'] = static function (): string {
 				add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );
@@ -260,14 +246,12 @@ class TemplateTags implements Renderable {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param array $tags    Template tags.
-	 * @param ?int  $post_id Post ID.
-	 *
-	 * @hook  blockify_template_tags
+	 * @param int $post_id Post ID.
 	 *
 	 * @return array
 	 */
-	public function add_extra_template_tags( array $tags, ?int $post_id ): array {
+	private function get_extra_template_tags( int $post_id ): array {
+		$tags                = [];
 		$tags['logout']      = esc_url( wp_logout_url() );
 		$tags['logout_home'] = esc_url( wp_logout_url( home_url() ) );
 
@@ -303,22 +287,45 @@ class TemplateTags implements Renderable {
 	}
 
 	/**
-	 * Get the archive title for the home page.
+	 * Get template tags.
 	 *
-	 * @since 1.3.0
+	 * @since 0.9.34
 	 *
-	 * @param string $title Archive title.
+	 * @param ?int $post_id Extra tags.
 	 *
-	 * @hook  get_the_archive_title
-	 *
-	 * @return string
+	 * @return array
 	 */
-	public function get_the_archive_title_home( string $title ): string {
-		if ( is_home() ) {
-			$title = get_the_title( get_option( 'page_for_posts', true ) );
-		}
+	private function get_template_tags( ?int $post_id ): array {
+		$year       = gmdate( 'Y' );
+		$site_name  = get_bloginfo( 'name', 'display' );
+		$stylesheet = get_stylesheet();
+		$tags       = array_merge(
+			[
+				'year'         => $year,
+				'current_year' => $year, // Backwards compatibility.
+				'date'         => gmdate( 'm/d/Y' ),
+				'home_url'     => home_url(),
+				'site_title'   => $site_name,
+				'site_name'    => $site_name,
+				'stylesheet'   => $stylesheet,
+				'theme_name'   => Str::title_case( $stylesheet ),
+			],
+			$this->get_post_template_tags( $post_id ),
+			$this->get_archive_template_tags(),
+			$this->get_extra_template_tags( $post_id )
+		);
 
-		return $title;
+		/**
+		 * Filter template tags.
+		 *
+		 * @since 0.9.34
+		 *
+		 * @param array $tags    Template tags.
+		 * @param int   $post_id Post ID.
+		 *
+		 * @return array
+		 */
+		return apply_filters( 'blockify_template_tags', $tags, $post_id );
 	}
 
 }
