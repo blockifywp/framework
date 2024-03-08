@@ -47,45 +47,51 @@ class PostExcerpt implements Renderable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$query_post_id  = $instance->context['postId'] ?? false;
-		$custom_excerpt = get_post_field( 'post_excerpt', $query_post_id ?? get_the_ID() );
-		$is_query_loop  = ( WP_Block_Supports::$block_to_render['blockName'] ?? '' ) === 'core/post-template';
+		$query_post_id   = $instance->context['postId'] ?? false;
+		$custom_excerpt  = get_post_field( 'post_excerpt', $query_post_id ?? get_the_ID() );
+		$default_excerpt = $block['attrs']['defaultExcerpt'] ?? '';
+		$is_query_loop   = ( WP_Block_Supports::$block_to_render['blockName'] ?? '' ) === 'core/post-template';
 
 		if ( is_singular() && ! $custom_excerpt && ! $is_query_loop ) {
 			return '';
 		}
 
+		$dom = DOM::create( $block_content );
+		$div = DOM::get_element( 'div', $dom );
+
+		if ( ! $div && ! $default_excerpt ) {
+			return $block_content;
+		}
+
+		if ( ! $div ) {
+			$div = DOM::create_element( 'div', $dom );
+
+			$div->setAttribute( 'class', 'wp-block-post-excerpt' );
+
+			$dom->appendChild( $div );
+		}
+
 		$hide_read_more = $block['attrs']['hideReadMore'] ?? false;
 
 		if ( $hide_read_more ) {
-			$dom   = DOM::create( $block_content );
-			$first = DOM::get_element( '*', $dom );
-
-			if ( ! $first ) {
-				return $block_content;
-			}
-
 			$read_more = DOM::get_elements_by_class_name( 'wp-block-post-excerpt__more-text', $dom )[0] ?? null;
 
 			if ( $read_more ) {
 				$read_more->parentNode->removeChild( $read_more );
 			} else {
-				$classes = explode( ' ', $first->getAttribute( 'class' ) );
+				$classes = explode( ' ', $div->getAttribute( 'class' ) );
 
 				if ( ! in_array( 'hide-read-more', $classes, true ) ) {
 					$classes[] = 'hide-read-more';
 				}
 
-				$first->setAttribute( 'class', implode( ' ', $classes ) );
+				$div->setAttribute( 'class', implode( ' ', $classes ) );
 			}
-
-			$block_content = $dom->saveHTML();
 		}
 
 		$more_text = $block['attrs']['moreText'] ?? '';
 
 		if ( $more_text ) {
-			$dom       = DOM::create( $block_content );
 			$more_link = DOM::get_elements_by_class_name( 'wp-block-post-excerpt__more-link', $dom )[0] ?? null;
 
 			if ( $more_link ) {
@@ -103,26 +109,26 @@ class PostExcerpt implements Renderable {
 				$screen_reader->textContent = esc_html__( ' about ', 'blockify' ) . ( $post_title );
 
 				$more_link->appendChild( $screen_reader );
-
-				$block_content = $dom->saveHTML();
 			}
 		}
 
-		$excerpt_length  = $block['attrs']['excerptLength'] ?? apply_filters( 'excerpt_length', 55 );
-		$default_excerpt = $block['attrs']['defaultExcerpt'] ?? '';
-		$excerpt         = $custom_excerpt ?: $default_excerpt;
+		$p = DOM::get_elements_by_class_name( 'wp-block-post-excerpt__excerpt', $dom )[0] ?? null;
+
+		$rendered_excerpt = '';
+
+		if ( $p ) {
+			$rendered_excerpt = $p->textContent;
+		}
+
+		$excerpt_length = $block['attrs']['excerptLength'] ?? apply_filters( 'excerpt_length', 55 );
+		$excerpt        = $rendered_excerpt ?: $custom_excerpt ?: $default_excerpt;
 
 		if ( ! $excerpt ) {
 			$excerpt = get_the_excerpt();
 		}
 
-		$dom = DOM::create( $block_content );
-		$div = DOM::get_elements_by_class_name( 'wp-block-post-excerpt', $dom )[0] ?? null;
-		$p   = DOM::get_elements_by_class_name( 'wp-block-post-excerpt__excerpt', $dom )[0] ?? null;
-
 		if ( ! $p ) {
-			$div = $div ?? DOM::create_element( 'div', $dom );
-			$p   = DOM::create_element( 'p', $dom );
+			$p = DOM::create_element( 'p', $dom );
 
 			$p->textContent = esc_html( $excerpt );
 			$p->setAttribute( 'class', 'wp-block-post-excerpt__excerpt' );
