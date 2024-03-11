@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\DesignSystem;
 
+use function array_merge;
 use function is_admin;
 use function str_replace;
 
@@ -38,7 +39,10 @@ class Layout {
 		$new['settings']['layout']['contentSize'] = str_replace( '100%', '100dvw', $content_size );
 		$new['settings']['layout']['wideSize']    = str_replace( '100%', '100dvw', $wide_size );
 
-		$theme_json->update_with( $new );
+		$theme_json->update_with( array_merge(
+			$default,
+			$new
+		) );
 
 		return $theme_json;
 	}
