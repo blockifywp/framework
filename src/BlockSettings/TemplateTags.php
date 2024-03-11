@@ -28,6 +28,7 @@ use function home_url;
 use function in_array;
 use function is_a;
 use function is_archive;
+use function is_author;
 use function is_callable;
 use function is_home;
 use function is_month;
@@ -232,6 +233,10 @@ class TemplateTags implements Renderable {
 
 				if ( is_year() ) {
 					$name = strip_tags( get_the_date( 'Y' ) );
+				}
+
+				if ( is_author() ) {
+					$name = get_the_author();
 				}
 
 				return $name;
