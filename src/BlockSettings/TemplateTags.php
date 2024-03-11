@@ -30,6 +30,7 @@ use function is_a;
 use function is_archive;
 use function is_author;
 use function is_callable;
+use function is_day;
 use function is_home;
 use function is_month;
 use function is_null;
@@ -233,6 +234,10 @@ class TemplateTags implements Renderable {
 
 				if ( is_year() ) {
 					$name = strip_tags( get_the_date( 'Y' ) );
+				}
+
+				if ( is_day() ) {
+					$name = strip_tags( get_the_date( 'F j, Y' ) );
 				}
 
 				if ( is_author() ) {
