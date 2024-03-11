@@ -192,11 +192,10 @@ class BoxShadow implements Renderable, Styleable {
 
 		$css = '';
 
-		if ( $style ) {
+		if ( ! empty( $style ) ) {
 			$css = 'body{' . CSS::array_to_string( $style ) . '}';
 		}
 
 		return $css;
 	}
-
 }

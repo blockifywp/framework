@@ -88,9 +88,9 @@ trait AssetsTrait {
 		$package_dir  = dirname( __DIR__, 2 );
 		$dir          = Path::get_package_dir( $project_dir, $package_dir );
 		$url          = Path::get_package_url( $project_dir, $package_dir );
-		$type         = str_contains( static::class, 'Style' ) ? 'css' : 'js';
-		$this->dir    = "{$dir}public/$type/";
-		$this->url    = "{$url}public/$type/";
+		$this->type   = str_contains( static::class, 'Style' ) ? 'css' : 'js';
+		$this->dir    = "{$dir}public/{$this->type}/";
+		$this->url    = "{$url}public/{$this->type}/";
 		$this->handle = strtolower( basename( dirname( $file ), '.php' ) );
 	}
 
@@ -187,7 +187,21 @@ trait AssetsTrait {
 			$string .= Str::remove_line_breaks( $asset );
 		}
 
-		return $string;
+		/**
+		 * Filters the inline assets.
+		 *
+		 * @param string $string        Inline assets.
+		 * @param string $template_html Global template HTML variable.
+		 * @param bool   $load_all      Load all assets.
+		 * @param object $instance      Instance of the class.
+		 */
+		return apply_filters(
+			"{$this->handle}_inline_{$this->type}",
+			$string,
+			$template_html,
+			$load_all,
+			$this
+		);
 	}
 
 	/**

@@ -30,7 +30,7 @@ class ConicGradient implements Styleable {
 	public function styles( Styles $styles ): void {
 		$settings  = wp_get_global_settings();
 		$gradients = $settings['color']['gradients']['custom'] ?? [];
-		$css       = [];
+		$style     = [];
 
 		foreach ( $gradients as $gradient ) {
 			$slug = $gradient['slug'] ?? '';
@@ -45,12 +45,14 @@ class ConicGradient implements Styleable {
 				$gradient['gradient']
 			);
 
-			$css[ '--wp--preset--gradient--' . $slug ] = $value;
+			$style[ '--wp--preset--gradient--' . $slug ] = $value;
 		}
 
-		$css = 'body{' . CSS::array_to_string( $css ) . '}';
+		if ( $style ) {
+			$css = 'body{' . CSS::array_to_string( $style ) . '}';
 
-		$styles->add_string( $css, [ 'custom-conic-' ] );
+			$styles->add_string( $css, [ 'custom-conic-' ] );
+		}
 	}
 
 }
