@@ -251,11 +251,11 @@ class TemplateTags implements Renderable {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param int $post_id Post ID.
+	 * @param ?int $post_id Post ID.
 	 *
 	 * @return array
 	 */
-	private function get_extra_template_tags( int $post_id ): array {
+	private function get_extra_template_tags( ?int $post_id ): array {
 		$tags                = [];
 		$tags['logout']      = esc_url( wp_logout_url() );
 		$tags['logout_home'] = esc_url( wp_logout_url( home_url() ) );
