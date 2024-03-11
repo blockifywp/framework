@@ -110,6 +110,10 @@ class EditorAssets {
 			'blockify',
 			$data
 		);
+
+		wp_enqueue_style(
+			'wp-codemirror'
+		);
 	}
 
 	/**

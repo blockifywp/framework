@@ -12,6 +12,7 @@ use WP_Block;
 use WP_Block_Supports;
 use function add_post_type_support;
 use function apply_filters;
+use function esc_attr;
 use function esc_html;
 use function esc_html__;
 use function explode;
@@ -144,11 +145,13 @@ class PostExcerpt implements Renderable {
 		if ( $text_color ) {
 			$custom_property = ! Str::contains_any( $text_color, '#', 'rgb', 'hsl' );
 
-			$styles['color'] = $custom_property ? 'var(--wp--preset--color--' . $text_color . ')' : $text_color;
+			$styles['color'] = esc_attr( $custom_property ? 'var(--wp--preset--color--' . $text_color . ')' : $text_color );
 		}
 
-		if ( $block['attrs']['textAlign'] ?? '' ) {
-			$div_classes[] = 'has-text-align-' . $block['attrs']['textAlign'];
+		$text_align = $block['attrs']['textAlign'] ?? '';
+
+		if ( $text_align ) {
+			$div_classes[] = 'has-text-align-' . esc_attr( $text_align );
 		}
 
 		$margin  = $block['attrs']['style']['spacing']['margin'] ?? '';
@@ -163,17 +166,17 @@ class PostExcerpt implements Renderable {
 		$align = $block['attrs']['align'] ?? '';
 
 		if ( $align ) {
-			$div_classes[] = 'align' . $align;
+			$div_classes[] = 'align' . esc_attr( $align );
 		}
 
 		$div->setAttribute( 'class', trim( implode( ' ', $div_classes ) ) );
 		$dom->appendChild( $div );
 
 		// Limit length.
-		$p->nodeValue = wp_trim_words(
+		$p->nodeValue = esc_html( wp_trim_words(
 			$p->nodeValue ?? '',
 			$excerpt_length,
-		);
+		) );
 
 		return $dom->saveHTML();
 	}
