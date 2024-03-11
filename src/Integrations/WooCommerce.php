@@ -6,10 +6,8 @@ namespace Blockify\Framework\Integrations;
 
 use Blockify\Utilities\Interfaces\Conditional;
 use WP_Block_Patterns_Registry;
-use WP_Block_Template;
 use function add_action;
 use function class_exists;
-use function get_template;
 use function remove_action;
 use function str_contains;
 
@@ -65,41 +63,5 @@ class WooCommerce implements Conditional {
 				$registry->unregister( $name );
 			}
 		}
-	}
-
-	/**
-	 * Remove unused templates from editor.
-	 *
-	 * @since 1.2.9
-	 *
-	 * @param ?WP_Block_Template[] $query_result  The query result.
-	 * @param array                $query         The query.
-	 * @param string               $template_type The template type.
-	 *
-	 * @hook  get_block_templates 10 3
-	 *
-	 * @return array
-	 */
-	public function remove_templates( ?array $query_result, array $query, string $template_type ): array {
-		if ( 'wp_template' !== $template_type ) {
-			return $query_result;
-		}
-
-		$woocommerce = class_exists( 'WooCommerce' );
-		$template    = get_template();
-
-		foreach ( $query_result as $index => $wp_block_template ) {
-			$slug = $wp_block_template->slug;
-
-			if ( $template !== $wp_block_template->theme ) {
-				continue;
-			}
-
-			if ( ! $woocommerce && str_contains( $slug, 'product' ) ) {
-				unset( $query_result[ $index ] );
-			}
-		}
-
-		return $query_result;
 	}
 }

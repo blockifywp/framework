@@ -4,14 +4,18 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\DesignSystem;
 
+use WP_Block_Template;
 use function array_unshift;
+use function class_exists;
 use function file_exists;
 use function get_post_type;
 use function get_queried_object;
 use function get_stylesheet_directory;
+use function get_template;
 use function get_template_directory;
 use function is_post_type_archive;
 use function is_search;
+use function str_contains;
 
 /**
  * Templates extension.
@@ -44,6 +48,47 @@ class Templates {
 		}
 
 		return $templates;
+	}
+
+	/**
+	 * Remove unused templates from editor.
+	 *
+	 * @since 1.2.9
+	 *
+	 * @param ?WP_Block_Template[] $query_result  The query result.
+	 * @param array                $query         The query.
+	 * @param string               $template_type The template type.
+	 *
+	 * @hook  get_block_templates
+	 *
+	 * @return array
+	 */
+	public function remove_templates( ?array $query_result, array $query, string $template_type ): array {
+		if ( 'wp_template' !== $template_type ) {
+			return $query_result;
+		}
+
+		$woocommerce = class_exists( 'WooCommerce' );
+		$edd         = class_exists( 'Easy_Digital_Downloads' );
+		$template    = get_template();
+
+		foreach ( $query_result as $index => $wp_block_template ) {
+			$slug = $wp_block_template->slug;
+
+			if ( $template !== $wp_block_template->theme ) {
+				continue;
+			}
+
+			if ( ! $woocommerce && str_contains( $slug, 'product' ) ) {
+				unset( $query_result[ $index ] );
+			}
+
+			if ( ! $edd && str_contains( $slug, 'download' ) ) {
+				unset( $query_result[ $index ] );
+			}
+		}
+
+		return $query_result;
 	}
 
 }
