@@ -13,6 +13,7 @@ use function get_queried_object;
 use function get_stylesheet_directory;
 use function get_template;
 use function get_template_directory;
+use function in_array;
 use function is_post_type_archive;
 use function is_search;
 use function str_contains;
@@ -71,11 +72,13 @@ class Templates {
 		$woocommerce = class_exists( 'WooCommerce' );
 		$edd         = class_exists( 'Easy_Digital_Downloads' );
 		$template    = get_template();
+		$stylesheet  = get_stylesheet();
 
 		foreach ( $query_result as $index => $wp_block_template ) {
-			$slug = $wp_block_template->slug;
+			$slug  = $wp_block_template->slug;
+			$theme = $wp_block_template->theme;
 
-			if ( $template !== $wp_block_template->theme ) {
+			if ( ! in_array( $theme, [ $template, $stylesheet ] ) ) {
 				continue;
 			}
 
