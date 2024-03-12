@@ -31,10 +31,11 @@ class Layout {
 			return $theme_json;
 		}
 
+
 		$default      = $theme_json->get_data();
 		$new          = [];
-		$content_size = $default['settings']['layout']['contentSize'] ?? 'min(calc(100dvw - var(--wp--preset--spacing--lg,2rem)), 720px)';
-		$wide_size    = $default['settings']['layout']['wideSize'] ?? 'min(calc(100dvw - var(--wp--preset--spacing--lg,2rem)), 1200px)';
+		$content_size = $default['settings']['layout']['contentSize'] ?? 'min(calc(100dvw - var(--wp--preset--spacing--xl,2rem)), 720px)';
+		$wide_size    = $default['settings']['layout']['wideSize'] ?? 'min(calc(100dvw - var(--wp--preset--spacing--xl,2rem)), 1200px)';
 
 		$new['settings']['layout']['contentSize'] = str_replace( '100%', '100dvw', $content_size );
 		$new['settings']['layout']['wideSize']    = str_replace( '100%', '100dvw', $wide_size );
