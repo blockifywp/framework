@@ -174,14 +174,14 @@ trait AssetsTrait {
 	/**
 	 * Returns string containing all inline assets.
 	 *
-	 * @param string $template_html Global template HTML variable.
-	 * @param bool   $load_all      Load all assets.
+	 * @param ?string $template_html Global template HTML variable.
+	 * @param bool    $load_all      Load all assets.
 	 *
 	 * @return string
 	 */
-	private function get_inline_assets( string $template_html, bool $load_all ): string {
+	private function get_inline_assets( ?string $template_html, bool $load_all ): string {
 		$string = '';
-		$assets = $this->get_assets( $template_html, $load_all );
+		$assets = $this->get_assets( $template_html ?? '', $load_all );
 
 		foreach ( $assets as $asset ) {
 			$string .= Str::remove_line_breaks( $asset );

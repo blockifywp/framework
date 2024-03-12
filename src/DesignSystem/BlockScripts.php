@@ -55,7 +55,7 @@ class BlockScripts {
 		];
 
 		foreach ( $scripts as $handle => $strings ) {
-			if ( ! str_contains( $template_html, $strings ) ) {
+			if ( ! str_contains( $template_html ?? '', $strings ) ) {
 				continue;
 			}
 
