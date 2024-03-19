@@ -235,7 +235,7 @@ class DarkMode implements Styleable {
 		foreach ( $gradients as $slug => $value ) {
 			$default_styles["--wp--preset--gradient--{$slug}"] = $value;
 
-			$camel_case     = Str::kebab_to_camel( $slug );
+			$camel_case     = Str::to_camel_case( $slug );
 			$opposite_value = $opposite_settings['gradients'][ $slug ] ?? $value;
 			$opposite_value = $opposite_settings['gradients'][ $camel_case ] ?? $opposite_value;
 
