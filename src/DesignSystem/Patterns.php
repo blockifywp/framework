@@ -12,7 +12,6 @@ use WP_Block_Patterns_Registry;
 use function apply_filters;
 use function basename;
 use function get_stylesheet_directory;
-use function get_template_directory;
 use function glob;
 use function in_array;
 use function is_dir;
@@ -159,7 +158,6 @@ HTML;
 	 */
 	private function get_pattern_dirs(): array {
 		$dirs = apply_filters( 'blockify_pattern_dirs', [
-			get_template_directory() . '/patterns',
 			get_stylesheet_directory() . '/patterns',
 		] );
 
