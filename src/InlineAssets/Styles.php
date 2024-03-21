@@ -55,7 +55,7 @@ class Styles implements Inlinable {
 	 */
 	public function add_editor_styles(): void {
 		$blocks      = glob( $this->dir . 'core-blocks/*.css' );
-		$vendor_path = Path::get_segments( $this->dir, -5 );
+		$vendor_path = Path::get_segment( $this->dir, -5 );
 
 		foreach ( $blocks as $block ) {
 			add_editor_style( $vendor_path . '/core-blocks/' . basename( $block ) );
