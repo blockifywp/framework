@@ -7,12 +7,15 @@ namespace Blockify\Framework\DesignSystem;
 use Blockify\Framework\InlineAssets\Styles;
 use function array_flip;
 use function file_get_contents;
+use function glob;
 use function is_a;
+use function is_admin;
 use function preg_replace;
 use function str_replace;
 use function str_starts_with;
 use function trim;
 use function wp_add_inline_style;
+use function wp_enqueue_block_style;
 
 /**
  * Block CSS.
@@ -29,6 +32,13 @@ class BlockCss {
 	private string $css_dir;
 
 	/**
+	 * CSS URL.
+	 *
+	 * @var string
+	 */
+	private string $css_url;
+
+	/**
 	 * BlockCss constructor.
 	 *
 	 * @since 0.9.19
@@ -39,10 +49,11 @@ class BlockCss {
 	 */
 	public function __construct( Styles $styles ) {
 		$this->css_dir = $styles->dir;
+		$this->css_url = $styles->url;
 	}
 
 	/**
-	 * Adds conditional block styles.
+	 * Adds conditional block styles on front end.
 	 *
 	 * Uses wp_add_inline_style instead of wp_enqueue_block_style for less output.
 	 *
@@ -53,6 +64,10 @@ class BlockCss {
 	 * @return void
 	 */
 	public function add_block_styles(): void {
+		if ( is_admin() ) {
+			return;
+		}
+
 		global $wp_styles;
 
 		if ( ! is_a( $wp_styles, 'WP_Styles' ) ) {
@@ -84,6 +99,40 @@ class BlockCss {
 			$css = preg_replace( '/^[\pZ\pC]+|[\pZ\pC]+$/u', '', $css );
 
 			wp_add_inline_style( $handle, $css );
+		}
+	}
+
+	/**
+	 * Adds conditional block styles in editor.
+	 *
+	 * This is required for block styles to work on Windows.
+	 *
+	 * @hook after_setup_theme
+	 *
+	 * @return void
+	 */
+	public function add_editor_block_styles(): void {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		$files = glob( $this->css_dir . 'core-blocks/*.css' );
+
+		foreach ( $files as $file ) {
+			$basename = basename( $file );
+			$slug     = basename( $file, '.css' );
+
+			wp_enqueue_block_style(
+				"core/$slug",
+				[
+					'handle'  => 'blockify-core-' . $slug,
+					'src'     => $this->css_url . 'core-blocks/' . $basename,
+					'deps'    => [],
+					'version' => '1.0.0',
+					'media'   => 'all',
+					'path'    => $file,
+				]
+			);
 		}
 	}
 }
