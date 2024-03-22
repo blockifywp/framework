@@ -11,7 +11,9 @@ use WP_Block;
 use WP_Block_Patterns_Registry;
 use function apply_filters;
 use function basename;
+use function do_blocks;
 use function get_stylesheet_directory;
+use function get_template_directory;
 use function glob;
 use function in_array;
 use function is_dir;
@@ -137,6 +139,11 @@ class Patterns implements Renderable {
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
 		$slug = $block['attrs']['slug'] ?? '';
+		$name = $block['blockName'] ?? '';
+
+		if ( ! $block_content && $name === 'blockify/pattern' ) {
+			$block_content = do_blocks( "<!-- wp:pattern {\"slug\":\"$slug\"} /-->" );
+		}
 
 		if ( ! Debug::is_enabled() || ! $slug ) {
 			return $block_content;
@@ -158,6 +165,7 @@ HTML;
 	 */
 	private function get_pattern_dirs(): array {
 		$dirs = apply_filters( 'blockify_pattern_dirs', [
+			get_template_directory() . '/patterns',
 			get_stylesheet_directory() . '/patterns',
 		] );
 
