@@ -56,6 +56,7 @@ class BlockSupports implements Scriptable {
 			],
 			'blockifyBoxShadow'    => true,
 			'blockifyPosition'     => true,
+			'blockifyTransform'    => true,
 		],
 		'core/button'                 => [
 			'spacing'              => [
@@ -87,6 +88,7 @@ class BlockSupports implements Scriptable {
 			'blockifyPosition'     => true,
 			'blockifySize'         => true,
 			'blockifyIcon'         => true,
+			'blockifyTransform'    => true,
 		],
 		'core/code'                   => [
 			'blockifyBoxShadow' => true,

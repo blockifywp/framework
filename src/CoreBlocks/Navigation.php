@@ -12,8 +12,6 @@ use Blockify\Utilities\Interfaces\Renderable;
 use WP_Block;
 use function array_keys;
 use function array_search;
-use function explode;
-use function implode;
 use function in_array;
 use function is_array;
 use function is_string;
@@ -55,13 +53,13 @@ class Navigation implements Renderable, Styleable {
 			return $block_content;
 		}
 
-		$styles       = CSS::string_to_array( $nav->getAttribute( 'style' ) );
-		$classes      = explode( ' ', $nav->getAttribute( 'class' ) );
+		$styles       = DOM::get_styles( $nav );
+		$classes      = DOM::get_classes( $nav );
 		$attrs        = $block['attrs'] ?? [];
-		$overlay_menu = $attrs['overlayMenu'] ?? true;
+		$overlay_menu = $attrs['overlayMenu'] ?? $attrs['icon'] ?? true;
 		$filter       = $attrs['style']['filter'] ?? null;
 
-		if ( $overlay_menu && ! empty( $filter ) ) {
+		if ( ! empty( $filter ) ) {
 			$filter_value = '';
 
 			foreach ( $filter as $property => $value ) {
@@ -76,6 +74,15 @@ class Navigation implements Renderable, Styleable {
 
 			$styles['--wp--custom--nav--filter'] = trim( $filter_value );
 
+			if ( $filter['backdrop'] ?? null ) {
+				$classes[] = 'has-backdrop-filter';
+			}
+
+			DOM::add_styles( $nav, $styles );
+			DOM::add_classes( $nav, $classes );
+		}
+
+		if ( $overlay_menu ) {
 			$overlay_background_color = $attrs['overlayBackgroundColor'] ?? $attrs['customOverlayBackgroundColor'] ?? '';
 
 			$global_settings = wp_get_global_settings();
@@ -102,16 +109,10 @@ class Navigation implements Renderable, Styleable {
 				$styles['--wp--custom--nav--background-color'] = CSS::format_custom_property( $overlay_background_color );
 			}
 
-			$nav->setAttribute( 'style', CSS::array_to_string( $styles ) );
-
-			if ( $filter['backdrop'] ?? null ) {
-				$classes[] = 'has-backdrop-filter';
-			}
-
-			$nav->setAttribute( 'class', implode( ' ', $classes ) );
-
-			$block_content = $dom->saveHTML();
+			DOM::add_styles( $nav, $styles );
 		}
+
+		$block_content = $dom->saveHTML();
 
 		$spacing = $attrs['style']['spacing'] ?? null;
 

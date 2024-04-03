@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace Blockify\Framework\CoreBlocks;
 
 use Blockify\Framework\BlockSettings\Responsive;
+use Blockify\Framework\BlockSettings\Transform;
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon;
@@ -20,7 +21,6 @@ use function implode;
 use function in_array;
 use function str_contains;
 use function str_replace;
-use function trim;
 use function wp_get_global_settings;
 
 /**
@@ -38,14 +38,22 @@ class Button implements Renderable {
 	private array $responsive_settings;
 
 	/**
+	 * Transform settings.
+	 *
+	 * @var Transform
+	 */
+	private Transform $transform;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Responsive $responsive Block settings.
 	 *
 	 * @return void
 	 */
-	public function __construct( Responsive $responsive ) {
+	public function __construct( Responsive $responsive, Transform $transform ) {
 		$this->responsive_settings = $responsive->settings;
+		$this->transform           = $transform;
 	}
 
 	/**
@@ -71,214 +79,119 @@ class Button implements Renderable {
 
 		$attrs      = $block['attrs'] ?? [];
 		$class_name = $attrs['className'] ?? '';
+		$dom        = DOM::create( $block_content );
+		$div        = DOM::get_element( 'div', $dom );
+
+		if ( ! $div ) {
+			$div = DOM::create_element( 'div', $dom );
+
+			$div->setAttribute( 'class', 'wp-block-button ' . $class_name );
+
+			$dom->appendChild( $div );
+		}
+
+		$link = DOM::get_element( 'a', $div );
+
+		if ( ! $link ) {
+			$link = DOM::create_element( 'a', $dom );
+
+			$div->appendChild( $link );
+		}
+
+		$link_classes = DOM::get_classes( $link );
+		$link_styles  = DOM::get_styles( $link );
+
+		if ( empty( $link_classes ) ) {
+			$link_classes[] = 'wp-element-button';
+			$link_classes[] = 'wp-block-button__link';
+		}
 
 		if ( str_contains( $class_name, 'is-style-outline' ) ) {
-			$dom = DOM::create( $block_content );
-			$div = DOM::get_element( 'div', $dom );
-
-			if ( ! $div ) {
-				$div = DOM::create_element( 'div', $dom );
-
-				$div->setAttribute( 'class', 'wp-block-button ' . $class_name );
-
-				$dom->appendChild( $div );
-			}
-
-			$link = DOM::get_element( 'a', $div );
-
-			if ( ! $link ) {
-				$link = DOM::create_element( 'a', $dom );
-
-				$div->appendChild( $link );
-			}
-
-			$classes = explode( ' ', $link->getAttribute( 'class' ) );
-			$styles  = CSS::string_to_array( $link->getAttribute( 'style' ) );
-
-			$classes[] = 'wp-element-button';
-			$classes[] = 'wp-block-button__link';
-
 			$text_color        = $attrs['textColor'] ?? null;
 			$custom_text_color = $attrs['style']['color']['text'] ?? null;
 
 			if ( $text_color || $custom_text_color ) {
-				$classes[] = 'has-text-color';
+				$link_classes[] = 'has-text-color';
 			}
 
 			if ( $text_color ) {
-				$classes[] = 'has-' . $text_color . '-color';
+				$link_classes[] = 'has-' . $text_color . '-color';
 			}
 
 			if ( $custom_text_color ) {
-				$styles['color'] = $custom_text_color;
+				$link_styles['color'] = $custom_text_color;
 			}
-
-			$link->setAttribute(
-				'class',
-				trim( implode(
-					' ',
-					array_unique( $classes )
-				) )
-			);
-
-			$link->setAttribute( 'style', CSS::array_to_string( $styles ) );
-
-			$block_content = $dom->saveHTML();
 		}
+
+		$div_classes = DOM::get_classes( $div );
+		$div_styles  = DOM::get_styles( $div );
 
 		if ( isset( $attrs['style']['border'] ) || isset( $attrs['borderColor'] ) ) {
 			$global_settings = wp_get_global_settings();
-			$dom             = DOM::create( $block_content );
-			$div             = DOM::get_element( 'div', $dom );
-			$link            = DOM::get_element( 'a', $dom );
 
-			if ( ! $div ) {
-				$div = DOM::create_element( 'div', $dom );
-
-				$dom->appendChild( $div );
-			}
-
-			if ( ! $link ) {
-				$link = DOM::create_element( 'a', $dom );
-
-				$div->appendChild( $link );
-			}
-
-			$classes     = explode( ' ', $div->getAttribute( 'class' ) );
-			$styles      = explode( ';', $div->getAttribute( 'style' ) );
-			$div_classes = [];
-			$div_styles  = [];
-
-			foreach ( $classes as $class ) {
-				if ( ! str_contains( $class, '-border-' ) ) {
-					$div_classes[] = $class;
+			foreach ( $div_classes as $index => $class ) {
+				if ( str_contains( $class, '-border-' ) ) {
+					unset( $div_classes[ $index ] );
 				}
 			}
 
-			foreach ( $styles as $style ) {
-				if ( ! str_contains( $style, 'border-' ) ) {
-					$div_styles[] = $style;
+			foreach ( $div_styles as $key => $style ) {
+				if ( str_contains( $key, 'border-' ) ) {
+					unset( $div_styles[ $key ] );
 				}
 			}
 
 			$border_width = $attrs['style']['border']['width'] ?? null;
 			$border_color = $attrs['style']['border']['color'] ?? null;
 
-			$link_styles = CSS::string_to_array( $link->getAttribute( 'style' ) );
-
 			if ( $border_width || $border_color ) {
 				$border_width = $border_width ?? $global_settings['custom']['border']['width'];
 
 				$link_styles['line-height'] = "calc(1em - $border_width)";
 			}
-
-			$link->setAttribute( 'style', CSS::array_to_string( $link_styles ) );
-			$div->setAttribute( 'class', implode( ' ', $div_classes ) );
-			$div->setAttribute( 'style', implode( ';', $div_styles ) );
-
-			if ( ! $div->getAttribute( 'style' ) ) {
-				$div->removeAttribute( 'style' );
-			}
-
-			$block_content = $dom->saveHTML();
-		}
-
-		$icon_set  = $attrs['iconSet'] ?? '';
-		$icon_name = $attrs['iconName'] ?? '';
-		$icon      = $icon_set && $icon_name ? Icon::get_svg( $icon_set, $icon_name ) : '';
-
-		if ( $icon ) {
-			$block_content = $this->render_icon( $block_content, $block, $icon );
-		}
-
-		$url = esc_url( $attrs['url'] ?? '' );
-
-		if ( ! $url ) {
-			$dom = DOM::create( $block_content );
-			$div = DOM::get_element( 'div', $dom );
-			$a   = DOM::get_element( 'a', $div );
-
-			if ( $a ) {
-				$href = $a->getAttribute( 'href' );
-
-				if ( $href ) {
-					$a->setAttribute( 'href', $href );
-				} else {
-
-					$on_click = $attrs['onclick'] ?? null;
-
-					if ( ! $on_click ) {
-						$a->setAttribute( 'href', '#' );
-					} else {
-						$a->setAttribute( 'href', 'javascript:void(0)' );
-					}
-				}
-			}
-
-			$block_content = $dom->saveHTML();
 		}
 
 		$size = esc_attr( $attrs['size'] ?? 'medium' );
 
 		if ( in_array( $size, [ 'small', 'large' ] ) ) {
-			$dom = DOM::create( $block_content );
-			$div = DOM::get_element( 'div', $dom );
+			$div_classes[] = "is-style-$size";
+		}
 
-			if ( $div ) {
-				$div_classes   = explode( ' ', $div->getAttribute( 'class' ) );
-				$div_classes[] = "is-style-$size";
+		DOM::add_classes( $link, $link_classes );
+		DOM::add_styles( $link, $link_styles );
+		DOM::add_classes( $div, $div_classes );
+		DOM::add_styles( $div, $div_styles );
 
-				$div->setAttribute( 'class', implode( ' ', $div_classes ) );
+		$url = esc_url( $attrs['url'] ?? '' );
+
+		if ( ! $url ) {
+			$href = $link->getAttribute( 'href' );
+
+			if ( $href ) {
+				$link->setAttribute( 'href', $href );
+			} else {
+
+				$on_click = $attrs['onclick'] ?? null;
+
+				if ( ! $on_click ) {
+					$link->setAttribute( 'href', '#' );
+				} else {
+					$link->setAttribute( 'href', 'javascript:void(0)' );
+				}
 			}
-
-			$block_content = $dom->saveHTML();
 		}
 
-		$inner_html = $block['innerHTML'] ?? $block['innerContent'] ?? $block_content;
-		$back_urls  = [
-			'javascript:history.go(-1)',
-			'javascript: history.go(-1)',
-		];
+		$block_content = $dom->saveHTML();
+		$block_content = $this->transform->render( $block_content, $block, $instance );
+		$icon_set      = $attrs['iconSet'] ?? '';
+		$icon_name     = $attrs['iconName'] ?? '';
+		$icon          = $icon_set && $icon_name ? Icon::get_svg( $icon_set, $icon_name ) : '';
 
-		foreach ( $back_urls as $back_url ) {
-			if ( str_contains( $inner_html, $back_url ) ) {
-				$block_content = str_replace( 'href="#"', 'href="' . $back_url . '"', $block_content );
-			}
+		if ( $icon ) {
+			$block_content = $this->render_icon( $block_content, $block, $icon );
 		}
 
-		if ( str_contains( $block_content, 'javascript:void' ) ) {
-			$block_content = str_replace(
-				[
-					'http://javascript:void',
-					'target="_blank"',
-				],
-				[
-					'javascript:void',
-					'disabled',
-				],
-				$block_content
-			);
-		}
-
-		if ( str_contains( $block_content, 'href="http://#"' ) ) {
-			$block_content = str_replace(
-				[
-					'href="http://#"',
-					'target="_blank"',
-				],
-				[
-					'href="#"',
-					'',
-				],
-				$block_content
-			);
-		}
-
-		if ( str_contains( $block_content, 'http://http' ) ) {
-			$block_content = str_replace( 'http://http', 'http', $block_content );
-		}
-
-		return $block_content;
+		return $this->correct_urls( $block, $block_content );
 	}
 
 	/**
@@ -440,5 +353,63 @@ class Button implements Renderable {
 			$block,
 			$this->responsive_settings
 		);
+	}
+
+	/**
+	 * Corrects URLs in block content.
+	 *
+	 * @since 0.0.2
+	 *
+	 * @param array  $block         Block attributes.
+	 * @param string $block_content Block content.
+	 *
+	 * @return string
+	 */
+	private function correct_urls( array $block, string $block_content ): string {
+		$inner_html = $block['innerHTML'] ?? $block['innerContent'] ?? $block_content;
+		$back_urls  = [
+			'javascript:history.go(-1)',
+			'javascript: history.go(-1)',
+		];
+
+		foreach ( $back_urls as $back_url ) {
+			if ( str_contains( $inner_html, $back_url ) ) {
+				$block_content = str_replace( 'href="#"', 'href="' . $back_url . '"', $block_content );
+			}
+		}
+
+		if ( str_contains( $block_content, 'javascript:void' ) ) {
+			$block_content = str_replace(
+				[
+					'http://javascript:void',
+					'target="_blank"',
+				],
+				[
+					'javascript:void',
+					'disabled',
+				],
+				$block_content
+			);
+		}
+
+		if ( str_contains( $block_content, 'href="http://#"' ) ) {
+			$block_content = str_replace(
+				[
+					'href="http://#"',
+					'target="_blank"',
+				],
+				[
+					'href="#"',
+					'',
+				],
+				$block_content
+			);
+		}
+
+		if ( str_contains( $block_content, 'http://http' ) ) {
+			$block_content = str_replace( 'http://http', 'http', $block_content );
+		}
+
+		return $block_content;
 	}
 }
