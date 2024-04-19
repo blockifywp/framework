@@ -52,7 +52,7 @@ class SocialLinks implements Renderable {
 			if ( $child->nodeName === 'li' ) {
 				$styles = CSS::string_to_array( $child->getAttribute( 'style' ) );
 
-				if ( ! $styles['color'] ) {
+				if ( ! ( $styles['color'] ?? null ) ) {
 					continue;
 				}
 
