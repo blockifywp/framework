@@ -28,6 +28,7 @@ class ServiceProvider implements Registerable {
 	 * @var string[]
 	 */
 	private array $services = [
+		BlockSettings\AdditionalStyles::class,
 		BlockSettings\Animation::class,
 		BlockSettings\BackdropBlur::class,
 		BlockSettings\BoxShadow::class,
@@ -49,6 +50,7 @@ class ServiceProvider implements Registerable {
 		BlockVariations\Grid::class,
 		BlockVariations\Icon::class,
 		BlockVariations\Marquee::class,
+		BlockVariations\Newsletter::class,
 		BlockVariations\RelatedPosts::class,
 		BlockVariations\Svg::class,
 		CoreBlocks\Button::class,
@@ -158,7 +160,7 @@ class ServiceProvider implements Registerable {
 				$service->styles( $styles );
 			}
 		}
-		
+
 		Hook::annotations( $scripts );
 		Hook::annotations( $styles );
 	}
