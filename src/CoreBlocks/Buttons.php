@@ -30,8 +30,9 @@ class Buttons implements Renderable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$margin  = $block['attrs']['style']['spacing']['margin'] ?? [];
-		$padding = $block['attrs']['style']['spacing']['padding'] ?? [];
+		$attrs   = $block['attrs'] ?? [];
+		$margin  = $attrs['style']['spacing']['margin'] ?? [];
+		$padding = $attrs['style']['spacing']['padding'] ?? [];
 
 		if ( $margin || $padding ) {
 			$dom = DOM::create( $block_content );

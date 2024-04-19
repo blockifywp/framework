@@ -157,6 +157,18 @@ class Button implements Renderable {
 			$div_classes[] = "is-style-$size";
 		}
 
+		$gap = $attrs['style']['spacing']['blockGap'] ?? null;
+
+		if ( $gap ) {
+			$link_styles['gap'] = CSS::format_custom_property( $gap );
+		}
+
+		$padding = $attrs['style']['spacing']['padding'] ?? [];
+
+		if ( $padding ) {
+			$link_styles = CSS::add_shorthand_property( $link_styles, 'padding', $padding );
+		}
+
 		DOM::add_classes( $link, $link_classes );
 		DOM::add_styles( $link, $link_styles );
 		DOM::add_classes( $div, $div_classes );
@@ -242,16 +254,8 @@ class Button implements Renderable {
 		$svg_dom  = DOM::create( $icon );
 		$svg      = DOM::get_element( 'svg', $svg_dom );
 		$imported = DOM::node_to_element( $dom->importNode( $svg, true ) );
-		$gap      = $attrs['style']['spacing']['blockGap'] ?? null;
 		$classes  = explode( ' ', $a->getAttribute( 'class' ) );
 		$styles   = CSS::string_to_array( $a->getAttribute( 'style' ) );
-
-		if ( $gap ) {
-			$styles['gap'] = CSS::format_custom_property( $gap );
-		}
-
-		$padding = $attrs['style']['spacing']['padding'] ?? [];
-		$styles  = CSS::add_shorthand_property( $styles, 'padding', $padding );
 
 		$text_color = $attrs['textColor'] ?? null;
 
