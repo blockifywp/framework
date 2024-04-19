@@ -110,16 +110,12 @@ class EditorAssets {
 			'blockify',
 			$data
 		);
-
-		wp_enqueue_style(
-			'wp-codemirror'
-		);
 	}
 
 	/**
 	 * Enqueue editor styles.
 	 *
-	 * @hook enqueue_block_editor_assets 11
+	 * @hook enqueue_block_assets 11
 	 *
 	 * @return void
 	 */
@@ -140,5 +136,9 @@ class EditorAssets {
 		);
 
 		wp_enqueue_style( $handle );
+
+		wp_enqueue_style(
+			'wp-codemirror'
+		);
 	}
 }
