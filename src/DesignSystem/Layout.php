@@ -4,6 +4,8 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\DesignSystem;
 
+use Blockify\Framework\InlineAssets\Scriptable;
+use Blockify\Framework\InlineAssets\Scripts;
 use function array_merge;
 use function is_admin;
 use function str_replace;
@@ -13,7 +15,7 @@ use function str_replace;
  *
  * @since 0.4.2
  */
-class Layout {
+class Layout implements Scriptable {
 
 	/**
 	 * Changes layout size unit from vw to % in editor.
@@ -46,5 +48,17 @@ class Layout {
 		) );
 
 		return $theme_json;
+	}
+
+	/**
+	 * Enqueue scripts.
+	 *
+	 * @since 1.6.0
+	 */
+	public function scripts( Scripts $scripts ): void {
+		$scripts->add_file(
+			'header-height.js',
+			[ 'has-header-height' ]
+		);
 	}
 }
