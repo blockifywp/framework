@@ -46,8 +46,16 @@ class Details implements Renderable, Scriptable {
 		$expand_icon = $attrs['expandIcon'] ?? '';
 		$classes     = explode( ' ', $details->getAttribute( 'class' ) );
 
+		if ( ! $expand_icon || $expand_icon === 'chevron' ) {
+			$classes[] = 'is-style-chevron';
+		}
+
 		if ( $expand_icon === 'plus' ) {
 			$classes[] = 'is-style-plus';
+		}
+
+		if ( $expand_icon === 'circle' ) {
+			$classes[] = 'is-style-circle';
 		}
 
 		$details->setAttribute( 'class', implode( ' ', $classes ) );
