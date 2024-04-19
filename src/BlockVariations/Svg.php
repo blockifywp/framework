@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\BlockVariations;
 
+use Blockify\Framework\BlockSettings\Onclick;
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon;
@@ -26,6 +27,24 @@ use function trim;
  * @since 1.0.0
  */
 class Svg implements Renderable {
+
+	/**
+	 * Onclick instance.
+	 *
+	 * @var Onclick
+	 */
+	private Onclick $onclick;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param Onclick $onclick Onclick instance.
+	 *
+	 * @return void
+	 */
+	public function __construct( Onclick $onclick ) {
+		$this->onclick = $onclick;
+	}
 
 	/**
 	 * Render SVG block variation.
@@ -53,17 +72,23 @@ class Svg implements Renderable {
 			return $block_content;
 		}
 
-		$dom    = DOM::create( $block_content );
-		$figure = DOM::get_element( 'figure', $dom );
-		$link   = DOM::get_element( 'a', $figure );
-		$img    = DOM::get_element( 'img', $link ?? $figure );
-		$svg    = DOM::get_element( 'svg', $link ?? $figure );
-		$width  = esc_attr( $attrs['width'] ?? '' );
-		$height = esc_attr( $attrs['height'] ?? '' );
-		$mask   = (bool) ( $attrs['style']['maskSvg'] ?? false );
+		$dom      = DOM::create( $block_content );
+		$figure   = DOM::get_element( 'figure', $dom );
+		$link     = DOM::get_element( 'a', $figure );
+		$img      = DOM::get_element( 'img', $link ?? $figure );
+		$svg      = DOM::get_element( 'svg', $link ?? $figure );
+		$width    = esc_attr( $attrs['width'] ?? '' );
+		$height   = esc_attr( $attrs['height'] ?? '' );
+		$mask     = (bool) ( $attrs['style']['maskSvg'] ?? false );
+		$on_click = $attrs['onclick'] ?? '';
 
 		if ( $mask ) {
 			//return $this->render_mask( $img, $svg_string, $dom, $width, $height );
+		}
+
+		if ( $on_click ) {
+			( $link ?? $figure ?? $img )->setAttribute( 'onclick', $on_click );
+			$block_content = $dom->saveHTML();
 		}
 
 		if ( $svg ) {
