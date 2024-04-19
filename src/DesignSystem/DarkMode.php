@@ -188,7 +188,7 @@ class DarkMode implements Styleable {
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
-		if ( is_admin() ) {
+		if ( is_admin() || ! $this->is_enabled() ) {
 			return;
 		}
 
@@ -267,6 +267,17 @@ class DarkMode implements Styleable {
 		$css .= "@media (prefers-color-scheme:$opposite_mode){body{" . CSS::array_to_string( $opposite_styles ) . "}}";
 
 		$styles->add_string( $css );
+	}
+
+	/**
+	 * Checks if dark mode is enabled.
+	 *
+	 * @since 1.4.8
+	 *
+	 * @return bool
+	 */
+	private function is_enabled(): bool {
+		return apply_filters( 'blockify_dark_mode', true );
 	}
 
 	/**
