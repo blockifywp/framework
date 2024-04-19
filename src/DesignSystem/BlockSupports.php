@@ -88,7 +88,18 @@ class BlockSupports implements Scriptable {
 			'blockifyPosition'     => true,
 			'blockifySize'         => true,
 			'blockifyIcon'         => true,
+			'blockifyFilter'       => true,
 			'blockifyTransform'    => true,
+			'blockifyColor'        => [
+				//'iconColor'       => [
+				//	'property' => '--wp--custom--icon--color',
+				//	'selector' => '.%1$s > div',
+				//],
+				//'backgroundHover' => [
+				//	'property' => '--wp--custom--background-color-hover',
+				//	'selector' => '.%1$s',
+				//],
+			],
 		],
 		'core/code'                   => [
 			'blockifyBoxShadow' => true,
@@ -149,6 +160,7 @@ class BlockSupports implements Scriptable {
 					'color' => true,
 				],
 			],
+			'blockifyOnclick'      => true,
 			'blockifyPosition'     => true,
 		],
 		'core/details'                => [
@@ -186,6 +198,18 @@ class BlockSupports implements Scriptable {
 			],
 		],
 		'core/group'                  => [
+			'spacing'                => [
+				'blockGap'                      => [
+					'__experimentalDefault' => 'var(--wp--style--block-gap)',
+					'sides'                 => [ 'horizontal', 'vertical' ],
+				],
+				'margin'                        => [ 'top', 'bottom' ],
+				'padding'                       => true,
+				'__experimentalDefaultControls' => [
+					'padding'  => true,
+					'blockGap' => true,
+				],
+			],
 			'blockifyAnimation'      => true,
 			'blockifyBackground'     => true,
 			'blockifyBoxShadow'      => true,

@@ -112,11 +112,12 @@ class BaseCss implements Styleable {
 		];
 
 		$styles['block-variations'] = [
-			'accordion' => [ 'is-style-accordion' ],
-			'counter'   => [ 'is-style-counter' ],
-			'icon'      => [ 'is-style-icon' ],
-			'marquee'   => [ 'is-marquee' ],
-			'svg'       => [ 'is-style-svg' ],
+			'accordion'  => [ 'is-style-accordion' ],
+			'counter'    => [ 'is-style-counter' ],
+			'icon'       => [ 'is-style-icon' ],
+			'marquee'    => [ 'is-marquee' ],
+			'newsletter' => [ 'is-style-newsletter' ],
+			'svg'        => [ 'is-style-svg' ],
 		];
 
 		// Placeholder handled by service.
@@ -125,6 +126,7 @@ class BaseCss implements Styleable {
 			'aspect-ratio'      => [ 'has-aspect-ratio-' ],
 			'box-shadow'        => [ 'has-box-shadow' ],
 			'copy-to-clipboard' => [ 'copy-to-clipboard' ],
+			'filter'            => [ '--filter-hover' ],
 			'gradient-mask'     => [ '-gradient-background' ],
 			'inline-image'      => [ 'wp-image-' ],
 			'on-click'          => [ 'onclick="' ],

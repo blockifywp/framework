@@ -23,14 +23,15 @@ class Opacity implements Renderable {
 	 *
 	 * @param string   $block_content Block HTML.
 	 * @param array    $block         Block data.
-	 * @param WP_Block $instance      Block args.
+	 * @param WP_Block $instance      Block object.
 	 *
 	 * @hook  render_block 12
 	 *
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$opacity = $block['attrs']['style']['filter']['opacity'] ?? '';
+		$attrs   = $block['attrs'] ?? [];
+		$opacity = $attrs['style']['filter']['opacity'] ?? '';
 
 		if ( $opacity ) {
 			$dom   = DOM::create( $block_content );
