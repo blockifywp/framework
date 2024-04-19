@@ -59,7 +59,8 @@ class Animation implements Renderable, Styleable, Scriptable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$animation = $block['attrs']['animation'] ?? [];
+		$attrs     = $block['attrs'] ?? [];
+		$animation = $attrs['animation'] ?? [];
 
 		if ( empty( $animation ) ) {
 			return $block_content;

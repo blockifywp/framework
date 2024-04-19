@@ -92,15 +92,21 @@ class Icon implements Renderable {
 
 		$span         = DOM::change_tag_name( 'span', $img );
 		$gradient     = $attrs['gradient'] ?? null;
+		$animation    = $attrs['animation'] ?? null;
 		$span_classes = [ 'wp-block-image__icon' ];
 
 		if ( $gradient ) {
 			$span_classes[] = 'has-gradient';
 		}
 
-		$class_names         = explode( ' ', $classes );
-		$figure_classes      = explode( ' ', $figure->getAttribute( 'class' ) );
-		$figure_classes      = array_merge( $figure_classes, $class_names );
+		$class_names    = explode( ' ', $classes );
+		$figure_classes = DOM::get_classes( $figure );
+		$figure_classes = array_merge( $figure_classes, $class_names );
+
+		if ( $animation ) {
+			$figure_classes[] = 'has-animation';
+		}
+
 		$block_extras        = $this->responsive_settings;
 		$block_extra_classes = [];
 
@@ -164,6 +170,24 @@ class Icon implements Renderable {
 		$figure_styles = CSS::string_to_array( $figure->getAttribute( 'style' ) );
 		$span_styles   = CSS::string_to_array( $span->getAttribute( 'style' ) );
 		$properties    = wp_list_pluck( array_values( $block_extras ), 'property' );
+
+		if ( $animation ) {
+			$figure_styles['--animation-name']          = $animation['name'] ?? '';
+			$figure_styles['animation-duration']        = ( $animation['duration'] ?? '1' ) . 's';
+			$figure_styles['animation-delay']           = ( $animation['delay'] ?? '0' ) . 's';
+			$figure_styles['animation-timing-function'] = $animation['timingFunction'] ?? 'ease-in';
+			$figure_styles['animation-iteration-count'] = $animation['iterationCount'] ?? '1';
+
+			$infinite = $animation['event'] === 'infinite';
+
+			if ( $infinite ) {
+				$figure_styles['animation-name']            = $animation['name'] ?? '';
+				$figure_styles['animation-iteration-count'] = 'infinite';
+
+				unset( $figure_styles['--animation-name'] );
+				unset( $figure_styles['animation-delay'] );
+			}
+		}
 
 		$custom_properties = array_map(
 			static fn( string $property ): string => '--' . $property,
