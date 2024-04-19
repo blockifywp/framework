@@ -10,10 +10,10 @@ use Blockify\Utilities\Pattern;
 use WP_Block;
 use WP_Block_Patterns_Registry;
 use function apply_filters;
+use function array_unique;
 use function basename;
 use function do_blocks;
 use function get_stylesheet_directory;
-use function get_template_directory;
 use function glob;
 use function in_array;
 use function is_dir;
@@ -164,12 +164,19 @@ HTML;
 	 * @return array
 	 */
 	private function get_pattern_dirs(): array {
-		$dirs = apply_filters( 'blockify_pattern_dirs', [
-			get_template_directory() . '/patterns',
-			get_stylesheet_directory() . '/patterns',
-		] );
+		$template_dir   = get_template_directory();
+		$stylesheet_dir = get_stylesheet_directory();
+		$default_dirs   = [];
+		$default_dirs[] = $stylesheet_dir . '/patterns';
+
+		$dirs = apply_filters( 'blockify_pattern_dirs', $default_dirs );
 
 		$category_dirs = [];
+
+		// Register parent template patterns.
+		if ( $template_dir !== $stylesheet_dir ) {
+			$category_dirs[] = $template_dir . '/patterns/template';
+		}
 
 		foreach ( $dirs as $dir ) {
 			$dir = trailingslashit( $dir );
@@ -184,7 +191,7 @@ HTML;
 			];
 		}
 
-		return $category_dirs;
+		return array_unique( $category_dirs );
 	}
 
 }
