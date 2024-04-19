@@ -18,6 +18,7 @@ use function explode;
 use function filter_input;
 use function hexdec;
 use function in_array;
+use function is_admin;
 use function is_null;
 use function is_string;
 use function ltrim;
@@ -136,6 +137,10 @@ class DarkMode implements Styleable {
 	 * @return array
 	 */
 	public function body_classes( array $classes ): array {
+		if ( is_admin() ) {
+			return $classes;
+		}
+
 		$cookie          = filter_input( INPUT_COOKIE, 'blockifyDarkMode', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$url_param       = filter_input( INPUT_GET, 'dark_mode', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$global_settings = wp_get_global_settings();
@@ -183,6 +188,10 @@ class DarkMode implements Styleable {
 	 * @return void
 	 */
 	public function styles( Styles $styles ): void {
+		if ( is_admin() ) {
+			return;
+		}
+
 		$settings       = wp_get_global_settings();
 		$light_settings = $settings['custom']['lightMode'] ?? null;
 		$dark_settings  = $settings['custom']['darkMode'] ?? null;
