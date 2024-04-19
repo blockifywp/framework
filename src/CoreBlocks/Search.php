@@ -8,7 +8,9 @@ use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon;
 use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Utilities\Str;
 use WP_Block;
+use function array_unique;
 use function esc_attr;
 use function explode;
 use function trim;
@@ -136,6 +138,14 @@ class Search implements Renderable {
 		}
 
 		if ( $input_background ) {
+			foreach ( $input_classes as $index => $class ) {
+				if ( Str::contains_any( $class, 'has-background', '-background-color' ) ) {
+					unset( $input_classes[ $index ] );
+				}
+			}
+
+			unset( $input_styles['color'] );
+
 			$input_styles['background-color'] = CSS::format_custom_property( $input_background );
 		}
 
@@ -150,7 +160,7 @@ class Search implements Renderable {
 
 		$input->setAttribute(
 			'class',
-			implode( ' ', $input_classes )
+			implode( ' ', array_unique( $input_classes ) )
 		);
 
 		if ( $button && $button_styles ) {
