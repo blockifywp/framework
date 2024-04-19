@@ -22,6 +22,7 @@ use function in_array;
 use function method_exists;
 use function str_contains;
 use function str_replace;
+use function trim;
 use function urldecode;
 
 /**
@@ -132,6 +133,7 @@ class InlineSvg implements Renderable {
 	 */
 	public function render_inline_svg( string $block_content, array $block, WP_Block $instance ): string {
 		$blocks = [
+			'core/button',
 			'core/image',
 			'core/site-logo',
 			'core/post-featured-image',
@@ -176,16 +178,25 @@ class InlineSvg implements Renderable {
 			return $block_content;
 		}
 
-		$width  = $attrs['width'] ?? $img->getAttribute( 'width' );
-		$height = $attrs['height'] ?? $img->getAttribute( 'height' );
-		$alt    = $attrs['alt'] ?? $img->getAttribute( 'alt' );
+		$img_styles   = DOM::get_styles( $img );
+		$width_style  = $img_styles['width'] ?? null;
+		$height_style = $img_styles['height'] ?? null;
+		$width        = $width_style ?? $attrs['width'] ?? $img->getAttribute( 'width' ) ?? '';
+		$height       = $height_style ?? $attrs['height'] ?? $img->getAttribute( 'height' ) ?? '';
+		$alt          = $attrs['alt'] ?? $img->getAttribute( 'alt' ) ?? '';
 
 		if ( $width ) {
-			$svg->setAttribute( 'width', str_replace( 'px', '', (string) $width ) );
+			$svg->setAttribute(
+				'width',
+				trim( str_replace( 'px', '', (string) $width ) )
+			);
 		}
 
 		if ( $height ) {
-			$svg->setAttribute( 'height', str_replace( 'px', '', (string) $height ) );
+			$svg->setAttribute(
+				'height',
+				trim( str_replace( 'px', '', (string) $height ) )
+			);
 		}
 
 		if ( $alt ) {
