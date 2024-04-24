@@ -4,9 +4,9 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\Integrations;
 
+use Blockify\Container\Interfaces\Conditional;
 use Blockify\Framework\InlineAssets\Styleable;
 use Blockify\Framework\InlineAssets\Styles;
-use Blockify\Utilities\Interfaces\Conditional;
 
 /**
  * GravityForms integration.

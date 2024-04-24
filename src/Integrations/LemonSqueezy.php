@@ -4,8 +4,8 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\Integrations;
 
+use Blockify\Container\Interfaces\Conditional;
 use Blockify\Utilities\DOM;
-use Blockify\Utilities\Interfaces\Conditional;
 use function array_filter;
 use function defined;
 use function explode;

@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\Integrations;
 
-use Blockify\Utilities\Interfaces\Conditional;
+use Blockify\Container\Interfaces\Conditional;
 use function add_filter;
 use function add_theme_support;
 use function class_exists;

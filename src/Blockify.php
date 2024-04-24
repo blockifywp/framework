@@ -2,8 +2,8 @@
 
 declare( strict_types=1 );
 
+use Blockify\Container\Container;
 use Blockify\Framework\ServiceProvider;
-use Blockify\Utilities\Container;
 
 if ( ! class_exists( 'Blockify' ) ) {
 

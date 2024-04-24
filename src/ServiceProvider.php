@@ -4,13 +4,13 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework;
 
+use Blockify\Container\Container;
+use Blockify\Container\Interfaces\Registerable;
 use Blockify\Framework\InlineAssets\Scriptable;
 use Blockify\Framework\InlineAssets\Scripts;
 use Blockify\Framework\InlineAssets\Styleable;
 use Blockify\Framework\InlineAssets\Styles;
-use Blockify\Utilities\Container;
-use Blockify\Utilities\Hook;
-use Blockify\Utilities\Interfaces\Registerable;
+use Blockify\Hooks\Hook;
 use function is_object;
 
 /**

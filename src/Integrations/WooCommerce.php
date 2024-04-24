@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\Integrations;
 
-use Blockify\Utilities\Interfaces\Conditional;
+use Blockify\Container\Interfaces\Conditional;
 use WP_Block_Patterns_Registry;
 use function add_action;
 use function class_exists;

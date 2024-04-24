@@ -4,10 +4,10 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\CoreBlocks;
 
+use Blockify\Container\Interfaces\Conditional;
+use Blockify\Framework\Interfaces\Renderable;
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
-use Blockify\Utilities\Interfaces\Conditional;
-use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function do_blocks;
 use function esc_html__;
