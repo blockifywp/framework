@@ -12,6 +12,7 @@ use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon;
 use Blockify\Utilities\Interfaces\Renderable;
 use Blockify\Utilities\Str;
+use DOMElement;
 use WP_Block;
 use function array_merge;
 use function esc_attr;
@@ -110,13 +111,13 @@ class Placeholder implements Renderable, Styleable {
 		$dom           = DOM::create( $block_content );
 		$figure        = DOM::get_element( 'figure', $dom );
 
-		if ( ! $figure ) {
+		if ( ! $figure instanceof DOMElement ) {
 			return $block_content;
 		}
 
 		$img = DOM::get_element( 'img', $figure );
 
-		if ( $img ) {
+		if ( $img instanceof DOMElement ) {
 			$figure->removeChild( $img );
 		}
 
