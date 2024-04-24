@@ -9,7 +9,7 @@ use Blockify\Utilities\Block;
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon as IconUtility;
-use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function array_diff;
 use function array_unique;

@@ -9,7 +9,7 @@ use Blockify\Framework\InlineAssets\Scripts;
 use Blockify\Framework\InlineAssets\Styleable;
 use Blockify\Framework\InlineAssets\Styles;
 use Blockify\Utilities\CSS;
-use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function _wp_to_kebab_case;
 use function array_merge;

@@ -5,7 +5,7 @@ declare( strict_types=1 );
 namespace Blockify\Framework\DesignSystem;
 
 use Blockify\Utilities\Debug;
-use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Framework\Interfaces\Renderable;
 use Blockify\Utilities\Pattern;
 use WP_Block;
 use WP_Block_Patterns_Registry;

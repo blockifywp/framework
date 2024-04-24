@@ -6,7 +6,7 @@ namespace Blockify\Framework\BlockVariations;
 
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
-use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Framework\Interfaces\Renderable;
 use Blockify\Utilities\Str;
 use DOMElement;
 use WP_Block;

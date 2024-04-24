@@ -9,7 +9,7 @@ use Blockify\Framework\BlockSettings\Transform;
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon;
-use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Framework\Interfaces\Renderable;
 use Blockify\Utilities\JS;
 use Blockify\Utilities\Str;
 use WP_Block;

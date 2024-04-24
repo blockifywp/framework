@@ -5,7 +5,7 @@ declare( strict_types=1 );
 namespace Blockify\Framework\CoreBlocks;
 
 use Blockify\Utilities\DOM;
-use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Framework\Interfaces\Renderable;
 use DOMElement;
 use WP_Block;
 use function esc_html;

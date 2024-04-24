@@ -8,7 +8,7 @@ use Blockify\Framework\BlockSettings\Onclick;
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
 use Blockify\Utilities\Icon;
-use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Framework\Interfaces\Renderable;
 use Blockify\Utilities\Str;
 use DOMDocument;
 use DOMElement;

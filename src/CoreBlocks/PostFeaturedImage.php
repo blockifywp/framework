@@ -7,7 +7,7 @@ namespace Blockify\Framework\CoreBlocks;
 use Blockify\Framework\BlockSettings\CssFilter;
 use Blockify\Utilities\CSS;
 use Blockify\Utilities\DOM;
-use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function array_unique;
 use function esc_attr;

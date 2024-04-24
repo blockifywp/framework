@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Utilities\Interfaces\Renderable;
+use Blockify\Framework\Interfaces\Renderable;
 use Blockify\Utilities\Str;
 use WP_Block;
 use WP_Block_Type_Registry;
