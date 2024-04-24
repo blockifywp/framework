@@ -4,9 +4,10 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\CoreBlocks;
 
+use Blockify\Dom\CSS;
+use Blockify\Dom\DOM;
 use Blockify\Framework\BlockSettings\Image as ImageSettings;
-use Blockify\Utilities\CSS;
-use Blockify\Utilities\DOM;
+use Blockify\Framework\BlockSettings\Responsive;
 use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function in_array;
@@ -19,21 +20,21 @@ use function in_array;
 class Image implements Renderable {
 
 	/**
-	 * Image settings.
+	 * Responsive.
 	 *
-	 * @var array
+	 * @var Responsive
 	 */
-	private array $image_settings;
+	private Responsive $responsive;
 
 	/**
 	 * Image constructor.
 	 *
-	 * @param ImageSettings $image Image settings.
+	 * @param Responsive $responsive Responsive.
 	 *
 	 * @return void
 	 */
-	public function __construct( ImageSettings $image ) {
-		$this->image_settings = $image->settings;
+	public function __construct( Responsive $responsive ) {
+		$this->responsive = $responsive;
 	}
 
 	/**
@@ -68,10 +69,10 @@ class Image implements Renderable {
 		if ( ! $has_icon && ! $has_svg ) {
 
 			if ( in_array( $name, [ 'core/image', 'core/post-featured-image' ], true ) ) {
-				$block_content = CSS::add_responsive_classes(
+				$block_content = $this->responsive->add_responsive_classes(
 					$block_content,
 					$block,
-					$this->image_settings,
+					ImageSettings::SETTINGS,
 					(bool) $id
 				);
 			}

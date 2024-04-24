@@ -4,9 +4,9 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\BlockSettings;
 
-use Blockify\Utilities\DOM;
+use Blockify\Dom\DOM;
+use Blockify\Dom\JS;
 use Blockify\Framework\Interfaces\Renderable;
-use Blockify\Utilities\JS;
 use WP_Block;
 use function str_contains;
 use function strval;

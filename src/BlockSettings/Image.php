@@ -6,7 +6,6 @@ namespace Blockify\Framework\BlockSettings;
 
 use Blockify\Framework\InlineAssets\Scriptable;
 use Blockify\Framework\InlineAssets\Scripts;
-use Blockify\Utilities\CSS;
 use function is_admin;
 
 /**
@@ -16,12 +15,7 @@ use function is_admin;
  */
 class Image implements Scriptable {
 
-	/**
-	 * Image settings.
-	 *
-	 * @var array
-	 */
-	public array $settings = [
+	public const SETTINGS = [
 		'aspectRatio'    => [
 			'property' => 'aspect-ratio',
 			'label'    => 'Aspect Ratio',
@@ -175,6 +169,24 @@ class Image implements Scriptable {
 	];
 
 	/**
+	 * Responsive instance.
+	 *
+	 * @var Responsive
+	 */
+	private Responsive $responsive;
+
+	/**
+	 * Image constructor.
+	 *
+	 * @param Responsive $responsive Responsive instance.
+	 *
+	 * @return void
+	 */
+	public function __construct( Responsive $responsive ) {
+		$this->responsive = $responsive;
+	}
+
+	/**
 	 * Adds data to the block editor.
 	 *
 	 * @param Scripts $scripts Scripts instance.
@@ -184,7 +196,7 @@ class Image implements Scriptable {
 	public function scripts( Scripts $scripts ): void {
 		$scripts->add_data(
 			'imageOptions',
-			$this->settings,
+			self::SETTINGS,
 			[],
 			is_admin()
 		);
@@ -203,6 +215,6 @@ class Image implements Scriptable {
 	 * @return string
 	 */
 	public function render_image_compare( string $content, array $block ): string {
-		return CSS::add_responsive_classes( $content, $block, $this->settings );
+		return $this->responsive->add_responsive_classes( $content, $block, self::SETTINGS );
 	}
 }

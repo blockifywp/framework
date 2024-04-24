@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\BlockVariations;
 
-use Blockify\Utilities\DOM;
+use Blockify\Dom\DOM;
 use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 

@@ -5,9 +5,9 @@ declare( strict_types=1 );
 namespace Blockify\Framework\BlockVariations;
 
 use Blockify\Framework\BlockSettings\Onclick;
-use Blockify\Utilities\CSS;
-use Blockify\Utilities\DOM;
-use Blockify\Utilities\Icon;
+use Blockify\Dom\CSS;
+use Blockify\Dom\DOM;
+use Blockify\Icons\Icon;
 use Blockify\Framework\Interfaces\Renderable;
 use Blockify\Utilities\Str;
 use DOMDocument;

@@ -4,11 +4,12 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\BlockSettings;
 
+use Blockify\Dom\CSS;
+use Blockify\Dom\DOM;
 use Blockify\Framework\InlineAssets\Scriptable;
 use Blockify\Framework\InlineAssets\Scripts;
 use Blockify\Framework\InlineAssets\Styleable;
 use Blockify\Framework\InlineAssets\Styles;
-use Blockify\Utilities\CSS;
 use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function _wp_to_kebab_case;
@@ -25,12 +26,7 @@ use function str_replace;
  */
 class Responsive implements Renderable, Scriptable, Styleable {
 
-	/**
-	 * Responsive settings.
-	 *
-	 * @var array
-	 */
-	public array $settings = [
+	public const SETTINGS = [
 		'position'            => [
 			'property' => 'position',
 			'label'    => 'Position',
@@ -206,23 +202,134 @@ class Responsive implements Renderable, Scriptable, Styleable {
 	];
 
 	/**
-	 * Image settings.
-	 *
-	 * @var array
-	 */
-	private array $image_settings;
-
-	/**
-	 * Responsive constructor.
+	 * Gets responsive classes for a given property.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param Image $image Image settings.
+	 * @param string $block_content HTML content.
+	 * @param array  $block         Block data.
+	 * @param array  $options       Block options.
+	 * @param bool   $image         Is an image block.
 	 *
-	 * @return void
+	 * @return string
 	 */
-	public function __construct( Image $image ) {
-		$this->image_settings = $image->settings;
+	public static function add_responsive_classes( string $block_content, array $block, array $options, bool $image = false ): string {
+		$dom   = DOM::create( $block_content );
+		$first = DOM::get_element( '*', $dom );
+
+		if ( ! $first ) {
+			return $block_content;
+		}
+
+		$element = $first;
+
+		if ( $image ) {
+			$link    = DOM::get_element( 'a', $first );
+			$element = $link ? DOM::get_element( 'img', $link ) : DOM::get_element( 'img', $first );
+		}
+
+		if ( ! $element ) {
+			return $block_content;
+		}
+
+		$style   = $block['attrs']['style'] ?? [];
+		$classes = explode( ' ', $element->getAttribute( 'class' ) );
+
+		foreach ( $options as $key => $args ) {
+			if ( ! isset( $style[ $key ] ) || $style[ $key ] === '' ) {
+				continue;
+			}
+
+			$property = _wp_to_kebab_case( $key );
+
+			if ( isset( $args['options'] ) ) {
+				$both    = $style[ $key ]['all'] ?? '';
+				$mobile  = $style[ $key ]['mobile'] ?? '';
+				$desktop = $style[ $key ]['desktop'] ?? '';
+
+				if ( $both ) {
+					$classes[] = "has-{$property}-{$both}";
+				}
+
+				if ( $mobile ) {
+					$classes[] = "has-{$property}-{$mobile}-mobile";
+				}
+
+				if ( $desktop ) {
+					$classes[] = "has-{$property}-{$desktop}-desktop";
+				}
+			} else {
+				$classes[] = "has-{$property}";
+			}
+
+			$element->setAttribute( 'class', implode( ' ', $classes ) );
+
+			$block_content = $dom->saveHTML();
+		}
+
+		return $block_content;
+	}
+
+	/**
+	 * Adds responsive styles to DOM.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $block_content HTML content.
+	 * @param array  $block         Block data.
+	 * @param array  $options       Block options.
+	 *
+	 * @return string
+	 */
+	public static function add_responsive_styles( string $block_content, array $block, array $options ): string {
+		$style = $block['attrs']['style'] ?? [];
+
+		if ( ! $style ) {
+			return $block_content;
+		}
+
+		foreach ( $options as $key => $args ) {
+
+			if ( ! isset( $style[ $key ] ) ) {
+				continue;
+			}
+
+			// Has utility class.
+			if ( isset( $args['options'] ) ) {
+				continue;
+			}
+
+			$dom   = DOM::create( $block_content );
+			$first = DOM::get_element( '*', $dom );
+
+			if ( ! $first ) {
+				continue;
+			}
+
+			$styles   = CSS::string_to_array( $first->getAttribute( 'style' ) );
+			$property = _wp_to_kebab_case( $key );
+			$both     = $style[ $key ]['all'] ?? '';
+			$mobile   = $style[ $key ]['mobile'] ?? '';
+			$desktop  = $style[ $key ]['desktop'] ?? '';
+
+			if ( $both ) {
+				$styles[ '--' . $property ] = $both;
+			}
+
+			if ( $mobile ) {
+				$styles[ '--' . $property . '-mobile' ] = $mobile;
+			}
+
+			if ( $desktop ) {
+				$styles[ '--' . $property . '-desktop' ] = $desktop;
+			}
+
+			$first->setAttribute( 'style', CSS::array_to_string( $styles ) );
+
+			$block_content = $dom->saveHTML();
+		}
+
+		return $block_content;
 	}
 
 	/**
@@ -245,19 +352,19 @@ class Responsive implements Renderable, Scriptable, Styleable {
 			return $block_content;
 		}
 
-		$options = $this->settings;
-
-		$block_content = CSS::add_responsive_classes(
+		$block_content = $this->add_responsive_classes(
 			$block_content,
 			$block,
-			$options
+			self::SETTINGS
 		);
 
-		return CSS::add_responsive_styles(
+		$block_content = $this->add_responsive_styles(
 			$block_content,
 			$block,
-			$options
+			self::SETTINGS
 		);
+
+		return $block_content;
 	}
 
 	/**
@@ -272,7 +379,7 @@ class Responsive implements Renderable, Scriptable, Styleable {
 	public function scripts( Scripts $scripts ): void {
 		$scripts->add_data(
 			'responsiveOptions',
-			$this->settings,
+			self::SETTINGS,
 			[],
 			is_admin()
 		);
@@ -303,8 +410,8 @@ class Responsive implements Renderable, Scriptable, Styleable {
 	 */
 	public function get_styles( string $template_html, bool $load_all ): string {
 		$options = array_merge(
-			$this->settings,
-			$this->image_settings,
+			self::SETTINGS,
+			Image::SETTINGS,
 		);
 		$both    = '';
 		$mobile  = '';

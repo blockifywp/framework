@@ -4,10 +4,10 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\DesignSystem;
 
+use Blockify\Dom\CSS;
 use Blockify\Framework\InlineAssets\Styleable;
 use Blockify\Framework\InlineAssets\Styles;
 use Blockify\Utilities\Color;
-use Blockify\Utilities\CSS;
 use Blockify\Utilities\JSON;
 use Blockify\Utilities\Str;
 use function apply_filters;

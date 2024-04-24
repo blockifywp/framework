@@ -6,7 +6,7 @@ namespace Blockify\Framework\BlockSettings;
 
 use Blockify\Framework\InlineAssets\Scriptable;
 use Blockify\Framework\InlineAssets\Scripts;
-use Blockify\Utilities\DOM;
+use Blockify\Dom\DOM;
 use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function esc_html__;

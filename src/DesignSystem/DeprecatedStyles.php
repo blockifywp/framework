@@ -7,7 +7,7 @@ namespace Blockify\Framework\DesignSystem;
 use Blockify\Framework\InlineAssets\Styleable;
 use Blockify\Framework\InlineAssets\Styles;
 use Blockify\Utilities\Color;
-use Blockify\Utilities\CSS;
+use Blockify\Dom\CSS;
 use function file_exists;
 use function get_template_directory;
 use function wp_get_global_settings;

@@ -6,8 +6,8 @@ namespace Blockify\Framework\CoreBlocks;
 
 use Blockify\Container\Interfaces\Conditional;
 use Blockify\Framework\Interfaces\Renderable;
-use Blockify\Utilities\CSS;
-use Blockify\Utilities\DOM;
+use Blockify\Dom\CSS;
+use Blockify\Dom\DOM;
 use WP_Block;
 use function do_blocks;
 use function esc_html__;

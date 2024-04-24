@@ -6,8 +6,8 @@ namespace Blockify\Framework\BlockSettings;
 
 use Blockify\Framework\InlineAssets\Styleable;
 use Blockify\Framework\InlineAssets\Styles;
-use Blockify\Utilities\CSS;
-use Blockify\Utilities\DOM;
+use Blockify\Dom\CSS;
+use Blockify\Dom\DOM;
 use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function array_diff;

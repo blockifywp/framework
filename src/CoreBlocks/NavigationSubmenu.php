@@ -4,8 +4,8 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\CoreBlocks;
 
-use Blockify\Utilities\CSS;
-use Blockify\Utilities\DOM;
+use Blockify\Dom\CSS;
+use Blockify\Dom\DOM;
 use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function implode;

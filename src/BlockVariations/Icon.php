@@ -4,12 +4,12 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\BlockVariations;
 
+use Blockify\Dom\CSS;
+use Blockify\Dom\DOM;
 use Blockify\Framework\BlockSettings\Responsive;
-use Blockify\Utilities\Block;
-use Blockify\Utilities\CSS;
-use Blockify\Utilities\DOM;
-use Blockify\Utilities\Icon as IconUtility;
 use Blockify\Framework\Interfaces\Renderable;
+use Blockify\Icons\Icon as IconUtility;
+use Blockify\Utilities\Block;
 use WP_Block;
 use function array_diff;
 use function array_unique;
@@ -31,9 +31,9 @@ class Icon implements Renderable {
 	/**
 	 * Responsive settings.
 	 *
-	 * @var array
+	 * @var Responsive
 	 */
-	private array $responsive_settings;
+	private Responsive $responsive;
 
 	/**
 	 * Constructor.
@@ -45,7 +45,7 @@ class Icon implements Renderable {
 	 * @return void
 	 */
 	public function __construct( Responsive $responsive ) {
-		$this->responsive_settings = $responsive->settings;
+		$this->responsive = $responsive;
 	}
 
 	/**
@@ -107,7 +107,7 @@ class Icon implements Renderable {
 			$figure_classes[] = 'has-animation';
 		}
 
-		$block_extras        = $this->responsive_settings;
+		$block_extras        = Responsive::SETTINGS;
 		$block_extra_classes = [];
 
 		foreach ( $block_extras as $index => $args ) {
@@ -370,15 +370,15 @@ class Icon implements Renderable {
 		}
 
 		$block_content = $dom->saveHTML();
-		$block_content = CSS::add_responsive_classes(
+		$block_content = $this->responsive->add_responsive_classes(
 			$block_content,
 			$block,
-			$this->responsive_settings
+			Responsive::SETTINGS
 		);
-		$block_content = CSS::add_responsive_styles(
+		$block_content = $this->responsive->add_responsive_styles(
 			$block_content,
 			$block,
-			$this->responsive_settings
+			Responsive::SETTINGS
 		);
 
 		return $block_content;

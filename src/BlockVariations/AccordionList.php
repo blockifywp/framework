@@ -4,8 +4,8 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\BlockVariations;
 
-use Blockify\Utilities\CSS;
-use Blockify\Utilities\DOM;
+use Blockify\Dom\CSS;
+use Blockify\Dom\DOM;
 use Blockify\Framework\Interfaces\Renderable;
 use Blockify\Utilities\Str;
 use DOMElement;

@@ -6,7 +6,7 @@ namespace Blockify\Framework\DesignSystem;
 
 use Blockify\Framework\InlineAssets\Styleable;
 use Blockify\Framework\InlineAssets\Styles;
-use Blockify\Utilities\CSS;
+use Blockify\Dom\CSS;
 use function str_contains;
 use function str_replace;
 use function wp_get_global_settings;

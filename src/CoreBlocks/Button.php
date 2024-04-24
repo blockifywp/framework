@@ -4,13 +4,13 @@ declare( strict_types=1 );
 
 namespace Blockify\Framework\CoreBlocks;
 
+use Blockify\Dom\CSS;
+use Blockify\Dom\DOM;
+use Blockify\Dom\JS;
 use Blockify\Framework\BlockSettings\Responsive;
 use Blockify\Framework\BlockSettings\Transform;
-use Blockify\Utilities\CSS;
-use Blockify\Utilities\DOM;
-use Blockify\Utilities\Icon;
 use Blockify\Framework\Interfaces\Renderable;
-use Blockify\Utilities\JS;
+use Blockify\Icons\Icon;
 use Blockify\Utilities\Str;
 use WP_Block;
 use function array_unique;
@@ -33,9 +33,9 @@ class Button implements Renderable {
 	/**
 	 * Responsive settings.
 	 *
-	 * @var array
+	 * @var Responsive
 	 */
-	private array $responsive_settings;
+	private Responsive $responsive;
 
 	/**
 	 * Transform settings.
@@ -52,8 +52,8 @@ class Button implements Renderable {
 	 * @return void
 	 */
 	public function __construct( Responsive $responsive, Transform $transform ) {
-		$this->responsive_settings = $responsive->settings;
-		$this->transform           = $transform;
+		$this->responsive = $responsive;
+		$this->transform  = $transform;
 	}
 
 	/**
@@ -352,10 +352,10 @@ class Button implements Renderable {
 			$title->appendChild( $text );
 		}
 
-		return CSS::add_responsive_classes(
+		return $this->responsive->add_responsive_classes(
 			$dom->saveHTML(),
 			$block,
-			$this->responsive_settings
+			Responsive::SETTINGS
 		);
 	}
 

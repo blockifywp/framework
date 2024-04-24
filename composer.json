@@ -25,7 +25,9 @@
   "require": {
     "php": ">=7.4",
     "blockify/container": "dev-main",
+    "blockify/dom": "dev-main",
     "blockify/hooks": "dev-main",
+    "blockify/icons": "dev-main",
     "blockify/utilities": "dev-main"
   }
 }
