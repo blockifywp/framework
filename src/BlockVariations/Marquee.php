@@ -74,8 +74,7 @@ class Marquee implements Renderable {
 				if ( ! $clone ) {
 					continue;
 				}
-
-				$clone->setAttribute( 'aria-hidden', 'true' );
+				
 				$classes   = explode( ' ', $clone->getAttribute( 'class' ) );
 				$classes[] = 'is-cloned';
 				$clone->setAttribute( 'class', implode( ' ', $classes ) );
