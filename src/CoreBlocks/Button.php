@@ -15,6 +15,7 @@ use Blockify\Utilities\Str;
 use WP_Block;
 use function array_unique;
 use function esc_attr;
+use function esc_html;
 use function esc_url;
 use function explode;
 use function implode;
@@ -196,7 +197,7 @@ class Button implements Renderable {
 		$aria_label = $attrs['ariaLabel'] ?? null;
 
 		if ( $aria_label ) {
-			$link->setAttribute( 'aria-label', $aria_label );
+			$link->setAttribute( 'aria-label', esc_html( $aria_label ) );
 		}
 
 		$href = $link->getAttribute( 'href' );
