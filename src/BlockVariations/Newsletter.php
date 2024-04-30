@@ -45,7 +45,7 @@ class Newsletter implements Renderable {
 		$form->removeAttribute( 'action' );
 		$form->removeAttribute( 'method' );
 		$form->setAttribute( 'onsubmit', 'event.preventDefault();' );
-		$form->setAttribute( 'role', 'form' );
+		$form->removeAttribute( 'role' );
 
 		$input->setAttribute( 'type', 'text' );
 		$input->setAttribute( 'name', 'newsletter' );
