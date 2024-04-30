@@ -10,6 +10,7 @@ use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
 use function str_contains;
 use function strval;
+use function trim;
 
 /**
  * Onclick class.
@@ -48,7 +49,7 @@ class Onclick implements Renderable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$js = strval( $block['attrs']['onclick'] ?? '' );
+		$js = trim( strval( $block['attrs']['onclick'] ?? '' ) );
 
 		if ( ! $js ) {
 			return $block_content;

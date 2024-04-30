@@ -193,6 +193,23 @@ class Button implements Renderable {
 			}
 		}
 
+		$aria_label = $attrs['ariaLabel'] ?? null;
+
+		if ( $aria_label ) {
+			$link->setAttribute( 'aria-label', $aria_label );
+		}
+
+		$href = $link->getAttribute( 'href' );
+
+		if ( ! $href || '#' === $href || 'javascript:void(0)' === $href ) {
+			$button        = DOM::change_tag_name( 'button', $link );
+			$button_styles = DOM::get_styles( $button );
+			$padding       = $attrs['style']['spacing']['padding'] ?? [];
+			$button_styles = CSS::add_shorthand_property( $button_styles, 'padding', $padding );
+
+			DOM::add_styles( $button, $button_styles );
+		}
+
 		$block_content = $dom->saveHTML();
 		$block_content = $this->transform->render( $block_content, $block, $instance );
 		$icon_set      = $attrs['iconSet'] ?? '';
@@ -241,21 +258,25 @@ class Button implements Renderable {
 
 		$div->setAttribute( 'style', CSS::array_to_string( $div_styles ) );
 
-		$a = DOM::get_element( 'a', $div );
+		$link = DOM::get_element( 'a', $div );
 
-		if ( ! $a ) {
-			$a = DOM::create_element( 'a', $dom );
+		if ( ! $link ) {
+			$link = DOM::get_element( 'button', $div );
+		}
 
-			$a->setAttribute( 'class', 'wp-block-button__link wp-element-button' );
+		if ( ! $link ) {
+			$link = DOM::create_element( 'a', $dom );
 
-			$div->appendChild( $a );
+			$link->setAttribute( 'class', 'wp-block-button__link wp-element-button' );
+
+			$div->appendChild( $link );
 		}
 
 		$svg_dom  = DOM::create( $icon );
 		$svg      = DOM::get_element( 'svg', $svg_dom );
 		$imported = DOM::node_to_element( $dom->importNode( $svg, true ) );
-		$classes  = explode( ' ', $a->getAttribute( 'class' ) );
-		$styles   = CSS::string_to_array( $a->getAttribute( 'style' ) );
+		$classes  = explode( ' ', $link->getAttribute( 'class' ) );
+		$styles   = CSS::string_to_array( $link->getAttribute( 'style' ) );
 
 		$text_color = $attrs['textColor'] ?? null;
 
@@ -287,26 +308,26 @@ class Button implements Renderable {
 		}
 
 		if ( $styles ) {
-			$a->setAttribute( 'style', CSS::array_to_string( $styles ) );
+			$link->setAttribute( 'style', CSS::array_to_string( $styles ) );
 		}
 
-		$a->setAttribute( 'class', implode( ' ', array_unique( $classes ) ) );
+		$link->setAttribute( 'class', implode( ' ', array_unique( $classes ) ) );
 
 		$on_click = $attrs['onclick'] ?? null;
 
 		if ( $on_click ) {
-			$a->setAttribute( 'onclick', JS::format_inline_js( $on_click ) );
+			$link->setAttribute( 'onclick', JS::format_inline_js( $on_click ) );
 		}
 
-		$url = $attrs['url'] ?? $a->getAttribute( 'href' );
+		$url = $attrs['url'] ?? $link->getAttribute( 'href' );
 
 		if ( ! $url ) {
 			if ( ! $on_click ) {
-				$a->setAttribute( 'href', '#' );
+				$link->setAttribute( 'href', '#' );
 			} else {
-				$a = DOM::change_tag_name( 'button', $a );
+				DOM::change_tag_name( 'button', $link );
 
-				$a->setAttribute( 'href', 'javascript:void(0)' );
+				$link->setAttribute( 'href', 'javascript:void(0)' );
 			}
 		}
 
@@ -336,9 +357,9 @@ class Button implements Renderable {
 		$icon_position = $attrs['iconPosition'] ?? 'end';
 
 		if ( $icon_position === 'start' ) {
-			$svg = $a->insertBefore( $imported, $a->firstChild );
+			$svg = $link->insertBefore( $imported, $link->firstChild );
 		} else {
-			$svg = $a->appendChild( $imported );
+			$svg = $link->appendChild( $imported );
 		}
 
 		$title = $svg->insertBefore(

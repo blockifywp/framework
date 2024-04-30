@@ -156,7 +156,12 @@ class InlineSvg implements Renderable {
 		$figure = DOM::get_element( 'figure', $dom );
 		$first  = $div ?? $figure ?? null;
 		$link   = DOM::get_element( 'a', $first );
-		$img    = DOM::get_element( 'img', $link ?? $first );
+
+		if ( ! $link ) {
+			$link = DOM::get_element( 'button', $first );
+		}
+
+		$img = DOM::get_element( 'img', $link ?? $first );
 
 		if ( ! $img ) {
 			return $block_content;
@@ -191,6 +196,10 @@ class InlineSvg implements Renderable {
 		$width        = $width_style ?? $attrs['width'] ?? $img->getAttribute( 'width' ) ?? '';
 		$height       = $height_style ?? $attrs['height'] ?? $img->getAttribute( 'height' ) ?? '';
 		$alt          = $attrs['alt'] ?? $img->getAttribute( 'alt' ) ?? '';
+
+		if ( 'core/button' === $name && ! $height ) {
+			$height = $width;
+		}
 
 		if ( $width ) {
 			$svg->setAttribute(
