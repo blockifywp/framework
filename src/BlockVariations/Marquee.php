@@ -8,6 +8,7 @@ use Blockify\Dom\CSS;
 use Blockify\Dom\DOM;
 use Blockify\Framework\Interfaces\Renderable;
 use WP_Block;
+use function is_array;
 
 /**
  * Marquee class.
@@ -50,7 +51,13 @@ class Marquee implements Renderable {
 		$gap = $block['attrs']['style']['spacing']['blockGap'] ?? null;
 
 		if ( $gap || $gap === '0' ) {
-			$styles['--marquee-gap'] = CSS::format_custom_property( $gap );
+			if ( is_array( $gap ) ) {
+				$gap = $gap['horizontal'] ?? $gap['left'] ?? $gap['right'] ?? null;
+			}
+
+			if ( $gap ) {
+				$styles['--marquee-gap'] = CSS::format_custom_property( $gap );
+			}
 		}
 
 		$first->setAttribute( 'class', implode( ' ', $classes ) );
@@ -74,7 +81,7 @@ class Marquee implements Renderable {
 				if ( ! $clone ) {
 					continue;
 				}
-				
+
 				$classes   = explode( ' ', $clone->getAttribute( 'class' ) );
 				$classes[] = 'is-cloned';
 				$clone->setAttribute( 'class', implode( ' ', $classes ) );
