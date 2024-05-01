@@ -62,11 +62,11 @@ class Icon implements Renderable {
 	 * @return string
 	 */
 	public function render( string $block_content, array $block, WP_Block $instance ): string {
-		$attrs    = $block['attrs'] ?? [];
-		$set      = $attrs['iconSet'] ?? null;
-		$name     = $attrs['iconName'] ?? null;
-		$svg      = $attrs['iconSvgString'] ?? null;
-		$has_icon = ( ( $set && $name ) || $svg );
+		$attrs      = $block['attrs'] ?? [];
+		$set        = $attrs['iconSet'] ?? null;
+		$name       = $attrs['iconName'] ?? null;
+		$svg_string = $attrs['iconSvgString'] ?? null;
+		$has_icon   = ( ( $set && $name ) || $svg_string );
 
 		if ( ! $has_icon ) {
 			return $block_content;
@@ -74,7 +74,8 @@ class Icon implements Renderable {
 
 		$set     = $set ?? strtolower( 'WordPress' );
 		$name    = $name ?? 'star-empty';
-		$svg     = $svg ?? IconUtility::get_svg( $set, $name );
+		$size    = $attrs['iconSize'] ?? null;
+		$svg     = $svg_string ?? IconUtility::get_svg( $set, $name, $size );
 		$classes = $attrs['className'] ?? '';
 
 		if ( str_contains( $classes, 'all-icons' ) ) {
@@ -217,9 +218,7 @@ class Icon implements Renderable {
 			unset( $span_styles['--wp--custom--icon--url'] );
 		}
 
-		$size = $attrs['iconSize'] ?? null;
-
-		if ( $gradient && $size ) {
+		if ( $size ) {
 			$span_styles['--wp--custom--icon--size'] = $size;
 		} else {
 			unset( $span_styles['--wp--custom--icon--size'] );
@@ -359,6 +358,10 @@ class Icon implements Renderable {
 		}
 
 		if ( ! $gradient ) {
+			if ( $size && str_contains( $size, 'px' ) ) {
+				$size = str_replace( 'px', '', $size );
+			}
+
 			$icon = IconUtility::get_svg( $set, $name, $size );
 
 			if ( $icon ) {
