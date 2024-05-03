@@ -12,12 +12,14 @@ use Blockify\Icons\Icon as IconUtility;
 use Blockify\Utilities\Block;
 use WP_Block;
 use function array_diff;
+use function array_merge;
 use function array_unique;
 use function explode;
 use function in_array;
 use function is_array;
 use function str_contains;
 use function str_replace;
+use function trim;
 use function wp_get_global_settings;
 use function wp_list_pluck;
 
@@ -79,7 +81,7 @@ class Icon implements Renderable {
 		$classes = $attrs['className'] ?? '';
 
 		if ( str_contains( $classes, 'all-icons' ) ) {
-			return $this->render_all_icons( $set );
+			return $this->render_all_icons( $set, $attrs );
 		}
 
 		$block_content = ! $block_content ? '<figure class="wp-block-image is-style-icon"><img src="" alt=""/></figure>' : $block_content;
@@ -405,14 +407,18 @@ class Icon implements Renderable {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param string $set Icon set name.
+	 * @param string $set   Icon set name.
+	 * @param array  $attrs Block attributes.
 	 *
 	 * @return string
 	 */
-	private function render_all_icons( string $set = 'wordpress' ): string {
+	private function render_all_icons( string $set = 'wordpress', array $attrs = [] ): string {
 		$icons        = IconUtility::get_icon_data( null )[ $set ] ?? [];
 		$inner_blocks = [];
-		$limit        = 300;
+		$limit        = 500;
+
+		$attrs['className'] = trim( str_replace( 'all-icons', '', $attrs['className'] ?? '' ) );
+		$attrs['iconSize']  = $attrs['iconSize'] ?? '24px';
 
 		foreach ( $icons as $icon => $svg ) {
 			if ( $limit-- <= 0 ) {
@@ -421,15 +427,19 @@ class Icon implements Renderable {
 
 			$inner_blocks[] = [
 				'blockName' => 'core/image',
-				'attrs'     => [
-					'className'     => 'is-style-icon',
-					'iconSet'       => $set,
-					'iconName'      => $icon,
-					'iconSvgString' => $svg,
-					'iconSize'      => '1em',
-				],
+				'attrs'     => array_merge(
+					$attrs,
+					[
+						'iconSet'       => $set,
+						'iconName'      => $icon,
+						'iconSvgString' => $svg,
+					]
+				),
 			];
 		}
+
+		$padding_left = CSS::format_custom_property( $attrs['style']['spacing']['padding']['left'] ?? '0' );
+		$item_size    = "minmax(calc({$attrs['iconSize']} + ($padding_left * 2)),1fr)";
 
 		$block = [
 			'blockName'   => 'core/group',
@@ -441,11 +451,13 @@ class Icon implements Renderable {
 					'display'             => [
 						'all' => 'grid',
 					],
+					'width'               => [
+						'all' => '100%',
+					],
 					'gridTemplateColumns' => [
-						'all' => 'repeat(auto-fill, minmax(1.5em, 1fr))',
+						'all' => "repeat(auto-fill, $item_size)",
 					],
 				],
-				'fontSize'  => '24',
 				'textColor' => 'heading',
 				'layout'    => [
 					'type'        => 'flex',
