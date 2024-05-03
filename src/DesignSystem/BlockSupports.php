@@ -403,7 +403,6 @@ class BlockSupports implements Scriptable {
 				'right',
 				'none',
 			],
-			'alignWide'              => true,
 			'color'                  => [
 				'background' => true,
 				'gradients'  => true,

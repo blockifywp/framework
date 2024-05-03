@@ -97,6 +97,15 @@ class EditorAssets {
 			'defaultGradients' => $global_settings['color']['gradients']['default'] ?? [],
 		];
 
+		/**
+		 * Filter the editor data.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $data Editor data.
+		 *
+		 * @return array
+		 */
 		$data = apply_filters(
 			'blockify_editor_data',
 			array_merge(
