@@ -141,6 +141,10 @@ class DarkMode implements Styleable {
 			return $classes;
 		}
 
+		if ( ! $this->is_enabled() ) {
+			return $classes;
+		}
+
 		$cookie          = filter_input( INPUT_COOKIE, 'blockifyDarkMode', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$url_param       = filter_input( INPUT_GET, 'dark_mode', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$global_settings = wp_get_global_settings();
@@ -153,19 +157,17 @@ class DarkMode implements Styleable {
 		$default_mode = $this->get_default_mode( $global_settings );
 		$both_classes = [ 'is-style-light', 'is-style-dark' ];
 
-		$classes[] = 'default-mode-' . $default_mode;
+		if ( in_array( $default_mode, [ 'light', 'dark' ], true ) ) {
+			$classes[] = "is-style-{$default_mode}";
+		}
 
-		if ( $cookie === 'true' ) {
-			$classes[] = 'is-style-dark';
-		} else {
-			if ( $cookie === 'false' ) {
+		if ( $cookie ) {
+			$classes = array_diff( $classes, $both_classes );
+
+			if ( $cookie === 'true' ) {
+				$classes[] = 'is-style-dark';
+			} elseif ( $cookie === 'false' ) {
 				$classes[] = 'is-style-light';
-			} else {
-				if ( $cookie === 'system' ) {
-					$classes = array_diff( $classes, $both_classes );
-
-					$classes[] = 'default-mode-system';
-				}
 			}
 		}
 
@@ -192,27 +194,23 @@ class DarkMode implements Styleable {
 			return;
 		}
 
-		$settings       = wp_get_global_settings();
-		$light_settings = $settings['custom']['lightMode'] ?? null;
-		$dark_settings  = $settings['custom']['darkMode'] ?? null;
+		$settings      = wp_get_global_settings();
+		$dark_settings = $settings['custom']['darkMode'] ?? null;
 
 		if ( $dark_settings === false ) {
 			return;
 		}
 
-		$palette           = $settings['color']['palette']['theme'] ?? [];
-		$custom            = array_replace(
+		$palette      = $settings['color']['palette']['theme'] ?? [];
+		$custom       = array_replace(
 			JSON::compute_theme_vars( $settings['custom'] ?? [] ),
 			$this->custom_properties->get_custom_properties(),
 		);
-		$colors            = Color::get_color_values( $palette );
-		$gradients         = Color::get_color_values( $settings['color']['gradients']['theme'] ?? [], 'gradient' );
-		$system            = Color::get_system_colors();
-		$opposite_settings = $light_settings ?? $dark_settings ?? null;
-		$default_mode      = $this->get_default_mode( $settings );
-		$opposite_mode     = $default_mode === 'light' ? 'dark' : 'light';
-		$default_styles    = [];
-		$opposite_styles   = [];
+		$colors       = Color::get_color_values( $palette );
+		$gradients    = Color::get_color_values( $settings['color']['gradients']['theme'] ?? [], 'gradient' );
+		$system       = Color::get_system_colors();
+		$light_styles = [];
+		$dark_styles  = [];
 
 		foreach ( $colors as $slug => $value ) {
 			$explode = explode( '-', $slug );
@@ -223,7 +221,7 @@ class DarkMode implements Styleable {
 				continue;
 			}
 
-			$default_styles["--wp--preset--color--{$slug}"] = $value;
+			$light_styles["--wp--preset--color--{$slug}"] = $value;
 
 			$opposite_shade = $this->map[ $name ][ $shade ] ?? '';
 			$opposite_value = $colors[ $name . '-' . $opposite_shade ] ?? '';
@@ -237,18 +235,18 @@ class DarkMode implements Styleable {
 			}
 
 			if ( $opposite_value ) {
-				$opposite_styles["--wp--preset--color--{$slug}"] = $opposite_value;
+				$dark_styles["--wp--preset--color--{$slug}"] = $opposite_value;
 			}
 		}
 
 		foreach ( $gradients as $slug => $value ) {
-			$default_styles["--wp--preset--gradient--{$slug}"] = $value;
+			$light_styles["--wp--preset--gradient--{$slug}"] = $value;
 
 			$camel_case     = Str::to_camel_case( $slug );
 			$opposite_value = $opposite_settings['gradients'][ $slug ] ?? $value;
 			$opposite_value = $opposite_settings['gradients'][ $camel_case ] ?? $opposite_value;
 
-			$opposite_styles["--wp--preset--gradient--{$slug}"] = $opposite_value;
+			$dark_styles["--wp--preset--gradient--{$slug}"] = $opposite_value;
 		}
 
 		foreach ( $custom as $name => $value ) {
@@ -257,14 +255,14 @@ class DarkMode implements Styleable {
 			}
 
 			if ( is_string( $value ) && Str::contains_any( $value, '--wp--preset--color--', '--wp--preset--gradient--' ) ) {
-				$default_styles[ $name ]  = $value;
-				$opposite_styles[ $name ] = $value;
+				$light_styles[ $name ] = $value;
+				$dark_styles[ $name ]  = $value;
 			}
 		}
 
-		$css = "html .is-style-{$default_mode}{" . CSS::array_to_string( $default_styles ) . '}';
-		$css .= "html .is-style-{$opposite_mode}{" . CSS::array_to_string( $opposite_styles ) . '}';
-		$css .= "@media (prefers-color-scheme:$opposite_mode){body{" . CSS::array_to_string( $opposite_styles ) . "}}";
+		$css = "html .is-style-light{" . CSS::array_to_string( $light_styles ) . '}';
+		$css .= "html .is-style-dark{" . CSS::array_to_string( $dark_styles ) . '}';
+		$css .= "@media (prefers-color-scheme:dark){body{" . CSS::array_to_string( $dark_styles ) . "}}";
 
 		$styles->add_string( $css );
 	}
@@ -277,7 +275,10 @@ class DarkMode implements Styleable {
 	 * @return bool
 	 */
 	private function is_enabled(): bool {
-		return apply_filters( 'blockify_dark_mode', true );
+		return apply_filters(
+			'blockify_dark_mode',
+			! ( get_option( 'blockify', [] )['disableDarkMode'] ?? false )
+		);
 	}
 
 	/**
@@ -292,7 +293,7 @@ class DarkMode implements Styleable {
 	private function get_default_mode( array $global_settings ): string {
 		return apply_filters(
 			'blockify_default_mode',
-			isset( $global_settings['custom']['lightMode'] ) ? 'dark' : 'light',
+			get_option( 'blockify', [] )['defaultMode'] ?? 'system',
 			$global_settings
 		);
 	}
