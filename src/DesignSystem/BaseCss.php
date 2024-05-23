@@ -172,14 +172,14 @@ class BaseCss implements Styleable {
 		];
 
 		$styles['utilities'] = [
-			'align'     => [ 'vertical-align-top' ],
-			'dark-mode' => [
+			'align'         => [ 'vertical-align-top' ],
+			'dark-mode'     => [
 				'is-style-light',
 				'is-style-dark',
 				'hide-light-mode',
 				'hide-dark-mode',
 			],
-			'fade'      => [
+			'fade'          => [
 				'fade-top',
 				'fade-right',
 				'fade-bottom',
@@ -187,15 +187,15 @@ class BaseCss implements Styleable {
 				'fade-horizontal',
 				'fade-vertical',
 			],
-			'flex'      => [
+			'flex'          => [
 				'flex',
 				'justify-center',
 				'justify-space-between',
 				'align-content-center',
 				'align-stretch',
 			],
-			'height'    => [ 'height-100', 'height-auto' ],
-			'margin'    => [
+			'height'        => [ 'height-100', 'height-auto' ],
+			'margin'        => [
 				'margin-auto',
 				'margin-top-auto',
 				'margin-left-auto',
@@ -203,7 +203,8 @@ class BaseCss implements Styleable {
 				'margin-bottom-auto',
 				'no-margin',
 			],
-			'wrap'      => [ 'nowrap', 'wrap' ],
+			'toggle-switch' => [ 'toggle-switch' ],
+			'wrap'          => [ 'nowrap', 'wrap' ],
 		];
 
 		return $styles;

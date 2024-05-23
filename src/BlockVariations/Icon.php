@@ -438,15 +438,14 @@ class Icon implements Renderable {
 			];
 		}
 
-		$padding_left = CSS::format_custom_property( $attrs['style']['spacing']['padding']['left'] ?? '0' );
-		$item_size    = "minmax(calc({$attrs['iconSize']} + ($padding_left * 2)),1fr)";
+		$item_size = "minmax({$attrs['iconSize']},1fr)";
 
 		$block = [
 			'blockName'   => 'core/group',
 			'attrs'       => [
 				'style'     => [
 					'spacing'             => [
-						'blockGap' => 'var(--wp--preset--spacing--sm)',
+						'blockGap' => 'var(--wp--preset--spacing--md)',
 					],
 					'display'             => [
 						'all' => 'grid',
