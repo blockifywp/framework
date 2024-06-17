@@ -23,7 +23,7 @@ final class Blockify {
 	 *
 	 * @var string[]
 	 */
-	private const SERVICES = [
+	public const SERVICES = [
 		Blockify\Framework\BlockSettings\AdditionalStyles::class,
 		Blockify\Framework\BlockSettings\Animation::class,
 		Blockify\Framework\BlockSettings\BackdropBlur::class,
@@ -123,6 +123,14 @@ final class Blockify {
 		static $container = null;
 
 		if ( ! is_null( $container ) || ! file_exists( $file ) ) {
+			return;
+		}
+
+		if ( ! did_action( 'after_setup_theme' ) ) {
+			add_action(
+				'after_setup_theme',
+				static fn() => self::register( $file )
+			);
 			return;
 		}
 
